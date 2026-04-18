@@ -226,7 +226,7 @@ const Grievances = () => {
            <div className="grid grid-cols-2 gap-4">
                <Select 
                     label="Platform"
-                    data={['Uber', 'Zomato', 'Swiggy', 'Ola', 'Rapido']}
+                    data={['Uber', 'Careem', 'Yango', 'Bykea', 'Foodpanda', 'Fiverr', 'Upwork', 'Freelancer']}
                     value={formData.platform}
                     onChange={(val) => setFormData({...formData, platform: val})}
                />

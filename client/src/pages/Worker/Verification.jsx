@@ -155,7 +155,7 @@ const Verification = () => {
         <h3 className="text-lg font-bold text-slate-900 mb-8 border-none">Verification Process</h3>
         <Timeline active={1} bulletSize={24} lineWidth={2}>
           <Timeline.Item bullet={<UploadCloud size={12}/>} title="Submission">
-            <Text color="dimmed" size="sm">You upload a screenshot from your platform (Uber/Zomato etc).</Text>
+            <Text color="dimmed" size="sm">You upload a screenshot from your platform (Uber/Foodpanda etc).</Text>
           </Timeline.Item>
           <Timeline.Item bullet={<Clock size={12}/>} title="Crowd Verification">
             <Text color="dimmed" size="sm">Verified members or automated systems check the document.</Text>

@@ -12,7 +12,7 @@ const communityPostSchema = new mongoose.Schema({
   platform: {
     type: String,
     required: true,
-    enum: ['Uber', 'Careem', 'Zomato', 'Swiggy', 'Foodpanda', 'Bykea', 'Indriver', 'Other']
+    enum: ['Uber', 'Careem', 'Yango', 'Bykea', 'Foodpanda', 'Fiverr', 'Upwork', 'Freelancer', 'Other']
   },
   category: {
     type: String,

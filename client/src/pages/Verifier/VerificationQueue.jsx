@@ -82,7 +82,7 @@ const VerificationQueue = () => {
               />
               <Select
                 placeholder="Filter Platform"
-                data={['Uber', 'Zomato', 'Swiggy', 'Ola', 'Deliveroo']}
+                data={['Uber', 'Careem', 'Yango', 'Bykea', 'Foodpanda', 'Fiverr', 'Upwork', 'Freelancer']}
                 clearable
                 radius="md"
                 value={filterPlatform}

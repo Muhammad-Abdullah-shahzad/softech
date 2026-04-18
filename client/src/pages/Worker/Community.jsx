@@ -177,7 +177,7 @@ const Community = () => {
                 <Stack>
                     <Select 
                         placeholder="All Platforms" 
-                        data={['Uber', 'Careem', 'Zomato', 'Swiggy', 'Foodpanda', 'Bykea']} 
+                        data={['Uber', 'Careem', 'Yango', 'Bykea', 'Foodpanda', 'Fiverr', 'Upwork', 'Freelancer']} 
                         value={filters.platform}
                         onChange={(val) => setFilters(f => ({...f, platform: val}))}
                         radius="md"
@@ -319,7 +319,7 @@ const Community = () => {
                 <Select 
                     label="Platform" 
                     placeholder="Select Platform"
-                    data={['Uber', 'Careem', 'Zomato', 'Swiggy', 'Foodpanda', 'Bykea']}
+                    data={['Uber', 'Careem', 'Yango', 'Bykea', 'Foodpanda', 'Fiverr', 'Upwork', 'Freelancer']}
                     required
                     value={formData.platform}
                     onChange={(val) => setFormData(f => ({...f, platform: val}))}

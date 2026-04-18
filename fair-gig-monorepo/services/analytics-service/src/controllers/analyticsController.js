@@ -107,8 +107,8 @@ exports.getPlatformComparison = async (req, res) => {
         success: true,
         data: [
             { name: 'Uber', commissionRate: 25 },
-            { name: 'Zomato', commissionRate: 20 },
-            { name: 'Swiggy', commissionRate: 18 },
+            { name: 'Yango', commissionRate: 20 },
+            { name: 'Bykea', commissionRate: 18 },
             { name: 'Ola', commissionRate: 22 },
         ]
     });
@@ -130,8 +130,8 @@ exports.getCommunityInsights = async (req, res) => {
         data: {
             rateChanges: [
                 { platform: 'Uber', city: 'Mumbai', change: -5 },
-                { platform: 'Zomato', city: 'Delhi', change: 8 },
-                { platform: 'Swiggy', city: 'Bangalore', change: 3 }
+                { platform: 'Yango', city: 'Delhi', change: 8 },
+                { platform: 'Bykea', city: 'Bangalore', change: 3 }
             ]
         }
     });

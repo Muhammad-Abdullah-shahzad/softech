@@ -68,8 +68,8 @@ exports.getTrendingGrievances = async (req, res) => {
   try {
     const trending = [
       { title: 'Delayed Payments', platform: 'Uber', affectedCount: 156 },
-      { title: 'Unfair Rating Drop', platform: 'Zomato', affectedCount: 89 },
-      { title: 'Insurance Deductions', platform: 'Swiggy', affectedCount: 230 },
+      { title: 'Unfair Rating Drop', platform: 'Foodpanda', affectedCount: 89 },
+      { title: 'Insurance Deductions', platform: 'Bykea', affectedCount: 230 },
       { title: 'Account Suspension', platform: 'Careem', affectedCount: 45 }
     ];
 

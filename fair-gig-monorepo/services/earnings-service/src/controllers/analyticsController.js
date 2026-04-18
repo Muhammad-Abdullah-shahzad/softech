@@ -197,7 +197,7 @@ exports.getCommunityInsights = async (req, res) => {
   try {
     const rateChanges = [
       { platform: 'Uber', city: 'Karachi', change: 8.2 },
-      { platform: 'Zomato', city: 'Lahore', change: -4.5 },
+      { platform: 'Foodpanda', city: 'Lahore', change: -4.5 },
       { platform: 'Bykea', city: 'Islamabad', change: 12.1 },
       { platform: 'Careem', city: 'Lahore', change: 2.3 }
     ];
@@ -208,8 +208,8 @@ exports.getCommunityInsights = async (req, res) => {
         rateChanges,
         marketPulse: {
             uberAvailability: 88,
-            zomatoIncentives: 45,
-            swiggyVerification: 72
+            foodpandaIncentives: 45,
+            bykeaVerification: 72
         },
         sentiment: { satisfied: 68, concerned: 22, neutral: 10 }
       }

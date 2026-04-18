@@ -161,7 +161,7 @@ const AdvocateCommunity = () => {
                             <Filter size={18} className="text-slate-400" />
                             <Select 
                                 placeholder="Platform" 
-                                data={['All', 'Uber', 'Careem', 'Zomato', 'Swiggy', 'Foodpanda']} 
+                                data={['All', 'Uber', 'Careem', 'Yango', 'Bykea', 'Foodpanda', 'Fiverr', 'Upwork', 'Freelancer']} 
                                 value={filterPlatform}
                                 onChange={setFilterPlatform}
                                 size="xs"

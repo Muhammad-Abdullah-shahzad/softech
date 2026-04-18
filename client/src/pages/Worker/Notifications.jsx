@@ -23,7 +23,7 @@ const Notifications = () => {
         const anomalies = await getAnomalyAlerts(workerId);
         // Mocking other notifications for demonstration as per brief
         const mockOthers = [
-          { id: 'v1', type: 'verification', title: 'Earnings Verified', text: 'Your Zomato entry for April 12 has been successfully verified.', time: '2 hours ago', unread: true },
+          { id: 'v1', type: 'verification', title: 'Earnings Verified', text: 'Your Foodpanda entry for April 12 has been successfully verified.', time: '2 hours ago', unread: true },
           { id: 'g1', type: 'grievance', title: 'Response Received', text: 'Support has responded to your case regarding Uber payment deduction.', time: 'Yesterday', unread: false },
         ];
         

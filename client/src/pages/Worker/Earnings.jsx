@@ -165,9 +165,13 @@ const Earnings = () => {
           >
             <option value="All">All Platforms</option>
             <option value="Uber">Uber</option>
-            <option value="Zomato">Zomato</option>
-            <option value="Swiggy">Swiggy</option>
-            <option value="Ola">Ola</option>
+            <option value="Careem">Careem</option>
+            <option value="Yango">Yango</option>
+            <option value="Bykea">Bykea</option>
+            <option value="Foodpanda">Foodpanda</option>
+            <option value="Fiverr">Fiverr</option>
+            <option value="Upwork">Upwork</option>
+            <option value="Freelancer">Freelancer</option>
           </select>
         </div>
 
@@ -263,7 +267,7 @@ const Earnings = () => {
           <Select 
             label="Platform"
             placeholder="Select platform"
-            data={['Uber', 'Zomato', 'Swiggy', 'Ola', 'Rapido', 'Other']}
+            data={['Uber', 'Careem', 'Yango', 'Bykea', 'Foodpanda', 'Fiverr', 'Upwork', 'Freelancer', 'Other']}
             value={formData.platform}
             onChange={(val) => setFormData({...formData, platform: val})}
             required
