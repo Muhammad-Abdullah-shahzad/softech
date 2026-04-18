@@ -58,7 +58,7 @@ const AdvocateOverview = () => {
         </div>
     );
 
-    const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6'];
+    const COLORS = ['#28e0b6', '#0f172a', '#10b981', '#f59e0b', '#94a3b8'];
     const verificationPieData = data.verificationStats.map((item, idx) => ({
         name: item._id,
         value: item.count,
@@ -250,7 +250,7 @@ const AdvocateOverview = () => {
                                     cursor={{ fill: 'transparent' }} 
                                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
                                 />
-                                <Bar dataKey="avg" fill="#818cf8" radius={[0, 10, 10, 0]} barSize={40}>
+                                <Bar dataKey="avg" fill="#28e0b6" radius={[0, 10, 10, 0]} barSize={40}>
                                     {data.distribution.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                     ))}
@@ -295,7 +295,7 @@ const AdvocateOverview = () => {
 
 const CustomTreemapContent = (props) => {
     const { x, y, width, height, index, name, hourly } = props;
-    const COLORS = ['#6366f1', '#818cf8', '#a5b4fc', '#c7d2fe', '#e0e7ff'];
+    const COLORS = ['#28e0b6', '#4dffc8', '#80ffd9', '#b3ffeb', '#e0fff8'];
 
     return (
         <g>

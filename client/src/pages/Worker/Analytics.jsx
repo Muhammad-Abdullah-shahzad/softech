@@ -58,6 +58,23 @@ const Analytics = () => {
 
   if (loading) return <div>Loading Analytics...</div>;
 
+  const avgRate = hourlyTrend.length > 0 
+    ? Math.round(hourlyTrend.reduce((acc, curr) => acc + curr.rate, 0) / hourlyTrend.length) 
+    : 0;
+
+  let comparisonText = "Your market benchmarking statistics are based on dynamic data.";
+  if (cityMedian && avgRate > 0) {
+      if (avgRate > cityMedian) {
+          const diff = Math.round(((avgRate - cityMedian) / cityMedian) * 100);
+          comparisonText = `Excellent! You are currently earning ${diff}% above the regional median.`;
+      } else if (avgRate < cityMedian) {
+          const diff = Math.round(((cityMedian - avgRate) / cityMedian) * 100);
+          comparisonText = `Your average is ${diff}% below the regional median. Review your anomalies to optimize.`;
+      } else {
+          comparisonText = `Your earnings perfectly match the regional average standard.`;
+      }
+  }
+
   return (
     <div className="space-y-8 pb-12">
       <header>
@@ -86,13 +103,13 @@ const Analytics = () => {
                 <Tooltip 
                   contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'}}
                 />
-                <Area type="monotone" dataKey="rate" fill="#6366f1" fillOpacity={0.1} stroke="#6366f1" strokeWidth={3} />
+                <Area type="monotone" dataKey="rate" fill="#28e0b6" fillOpacity={0.1} stroke="#28e0b6" strokeWidth={3} />
                 <Line type="monotone" dataKey="cityAvg" stroke="#f43f5e" strokeDasharray="5 5" strokeWidth={2} dot={false} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
           <div className="mt-4 flex gap-4 text-xs font-medium">
-             <div className="flex items-center gap-1"><span className="w-3 h-1 bg-indigo-600 rounded"></span> Your Rate</div>
+             <div className="flex items-center gap-1"><span className="w-3 h-1 bg-[#28e0b6] rounded"></span> Your Rate</div>
              <div className="flex items-center gap-1"><span className="w-3 h-1 bg-rose-500 border-t border-dashed border-white"></span> City Median</div>
           </div>
         </div>
@@ -127,14 +144,14 @@ const Analytics = () => {
       <div className="bg-slate-900 rounded-3xl p-10 text-white relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="space-y-4">
-                <span className="bg-indigo-500 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">Fairness Report</span>
-                <h3 className="text-3xl font-bold max-w-md">Your market benchmarking statistics are based on dynamic data.</h3>
+                <span className="bg-[#28e0b6] text-slate-900 border-none text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">Fairness Report</span>
+                <h3 className="text-3xl font-bold max-w-md">{comparisonText}</h3>
                 <p className="text-slate-400 max-w-lg">Based on data from verified workers in your exact region.</p>
             </div>
             <div className="flex gap-10">
                 <div className="text-center">
                     <p className="text-slate-400 text-sm mb-1">Your Avg Rate</p>
-                    <p className="text-4xl font-black italic">₹{hourlyTrend.length > 0 ? (hourlyTrend.reduce((acc, curr) => acc + curr.rate, 0) / hourlyTrend.length).toFixed(0) : 0}</p>
+                    <p className="text-4xl font-black italic">₹{avgRate}</p>
                 </div>
                 <div className="text-center">
                     <p className="text-slate-400 text-sm mb-1">City Median Rate</p>
@@ -142,7 +159,7 @@ const Analytics = () => {
                 </div>
             </div>
         </div>
-        <Target className="absolute -bottom-10 -right-10 text-indigo-500/10 w-64 h-64" />
+        <Target className="absolute -bottom-10 -right-10 text-[#28e0b6]/10 w-64 h-64" />
       </div>
 
       {/* Row 2: Earnings Trend */}
@@ -155,11 +172,11 @@ const Analytics = () => {
                 <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
                 <Tooltip 
-                  cursor={{stroke: '#4f46e5', strokeWidth: 2}}
+                  cursor={{stroke: '#28e0b6', strokeWidth: 2}}
                   contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'}}
                 />
                 <Legend verticalAlign="top" align="right" />
-                <Line type="monotone" dataKey="amount" name="Net Amount" stroke="#4f46e5" strokeWidth={4} dot={{ r: 6, fill: '#4f46e5', strokeWidth: 3, stroke: '#fff' }} />
+                <Line type="monotone" dataKey="amount" name="Net Amount" stroke="#28e0b6" strokeWidth={4} dot={{ r: 6, fill: '#28e0b6', strokeWidth: 3, stroke: '#fff' }} />
               </LineChart>
             </ResponsiveContainer>
         </div>

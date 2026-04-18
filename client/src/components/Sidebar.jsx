@@ -8,13 +8,22 @@ const Sidebar = ({ navigation, currentRole }) => {
 
   return (
     <aside className="w-64 bg-white border-r border-slate-100 flex flex-col h-screen sticky top-0 overflow-y-auto">
-      <div className="p-6 flex items-center gap-3">
-        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
-          <span className="text-white font-bold text-xl">F</span>
+      <div className="p-8 flex items-center justify-center border-b border-slate-50 mb-4">
+        <img 
+            src="/logo.png" 
+            alt="FairGig" 
+            className="h-10 w-auto object-contain hover:scale-105 transition-transform cursor-pointer" 
+            onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+            }}
+        />
+        <div className="hidden items-center gap-2">
+            <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                <span className="text-brand-green font-bold text-xl leading-none">F</span>
+            </div>
+            <h1 className="text-xl font-black text-slate-900 tracking-tighter">FairGig</h1>
         </div>
-        <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">
-          FairGig
-        </h1>
       </div>
 
       <nav className="flex-1 px-4 py-2 space-y-8">
@@ -37,21 +46,21 @@ const Sidebar = ({ navigation, currentRole }) => {
                     className={({ isActive }) => `
                       flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group
                       ${isActive 
-                        ? 'bg-indigo-50 text-indigo-700 shadow-sm shadow-indigo-100/50' 
-                        : 'text-slate-600 hover:bg-slate-50 hover:text-indigo-600'}
+                        ? 'text-slate-900 font-bold' 
+                        : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}
                     `}
                   >
                     {Icon && (
                       <Icon 
                         size={20} 
-                        className={`transition-colors duration-200 ${isActive ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500'}`} 
+                        className={`transition-colors duration-200 ${isActive ? 'text-brand-green' : 'text-slate-400 group-hover:text-slate-600'}`} 
                       />
                     )}
                     <span className="font-medium">{link.label}</span>
                     {isActive && (
                       <motion.div
                         layoutId="active-pill"
-                        className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-600"
+                        className="ml-auto w-1.5 h-1.5 rounded-full bg-brand-green"
                       />
                     )}
                   </NavLink>

@@ -60,7 +60,7 @@ const VerifierAnalytics = () => {
     verified: '#10b981',
     flagged: '#f43f5e',
     unverifiable: '#f59e0b',
-    pending: '#6366f1'
+    pending: '#28e0b6'
   };
 
   const decisionPieData = [
@@ -146,8 +146,8 @@ const VerifierAnalytics = () => {
                     <AreaChart data={data.activity}>
                         <defs>
                             <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.1}/>
-                                <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                                <stop offset="5%" stopColor="#28e0b6" stopOpacity={0.2}/>
+                                <stop offset="95%" stopColor="#28e0b6" stopOpacity={0}/>
                             </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -166,7 +166,7 @@ const VerifierAnalytics = () => {
                         <Tooltip 
                             contentStyle={{borderRadius: '20px', border: 'none', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'}}
                         />
-                        <Area type="monotone" dataKey="count" stroke="#6366f1" strokeWidth={4} fillOpacity={1} fill="url(#colorCount)" />
+                        <Area type="monotone" dataKey="count" stroke="#28e0b6" strokeWidth={4} fillOpacity={1} fill="url(#colorCount)" />
                     </AreaChart>
                 </ResponsiveContainer>
             </div>

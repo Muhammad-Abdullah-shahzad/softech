@@ -42,89 +42,97 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col justify-center py-12 sm:px-6 lg:px-8 font-sans">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="text-center text-2xl font-semibold text-gray-900 tracking-tight">
-          Sign in to FairGig
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-500">
-          Enter your credentials to access your dashboard
-        </p>
+    <div className="min-h-screen bg-white flex font-sans overflow-hidden">
+      {/* Left Column: Visual (70%) — full bleed, no right-to-white wash */}
+      <div className="hidden lg:flex lg:w-[70%] relative overflow-hidden">
+        <img 
+            src="/workers.png" 
+            alt="The Workforce" 
+            className="absolute inset-0 w-full h-full object-cover"
+            onError={(e) => {
+                e.target.src = "https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1600&h=1200&fit=crop";
+            }}
+        />
+        {/* Dark scrim only at the bottom for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+
+        {/* Bottom-left text block */}
+        <div className="absolute bottom-16 left-16 z-10 max-w-lg">
+            <h1 className="text-5xl font-black text-white tracking-tighter uppercase italic leading-tight">
+                Empowering the<br />
+                <span style={{ color: '#28e0b6' }}>Gig Community</span>
+            </h1>
+            <p className="text-white/75 font-semibold mt-4 text-base leading-relaxed">
+                The global node for verified income and labor advocacy.
+            </p>
+        </div>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 border border-gray-200 sm:rounded-lg sm:px-10">
+      {/* Right Column: Identity Node (30%) — pure white, fully visible inputs */}
+      <div className="w-full lg:w-[30%] bg-white flex flex-col justify-center px-12 xl:px-16 z-20">
+        <div className="w-full max-w-sm mx-auto">
+
+          <img src="/logo.png" alt="FairGig" className="h-9 w-auto mb-12 object-contain" />
+
+          <div className="mb-10">
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">
+              Sign In
+            </h2>
+            <p className="text-sm text-slate-400 font-medium mt-1">
+              Access your advocacy portal.
+            </p>
+          </div>
+
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email address
+              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                Email Address
               </label>
-              <div className="mt-1">
-                <input
-                  type="email"
-                  required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
-                  value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                />
-              </div>
+              <input
+                type="email"
+                required
+                placeholder="name@fairgig.io"
+                className="block w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-300 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#28e0b6] focus:border-transparent transition-all"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+              />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
                 Password
               </label>
-              <div className="mt-1">
-                <input
-                  type="password"
-                  required
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  value={formData.password}
-                  onChange={(e) => setFormData({...formData, password: e.target.value})}
-                />
-              </div>
+              <input
+                type="password"
+                required
+                placeholder="••••••••"
+                className="block w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-300 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#28e0b6] focus:border-transparent transition-all"
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+              />
             </div>
 
-
-
-
-            <div>
+            <div className="pt-2">
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                className="w-full flex justify-center py-3.5 px-4 rounded-xl text-xs font-black uppercase tracking-widest text-white bg-slate-900 hover:bg-black transition-all active:scale-95 shadow-lg shadow-slate-900/20"
               >
-                Sign in
+                Confirm Identity
               </button>
             </div>
           </form>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  New to the platform?
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <Link
-                to="/signup"
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                Create an account
-              </Link>
-            </div>
+          <div className="mt-10 pt-10 border-t border-slate-100">
+            <p className="text-xs text-slate-400 font-semibold mb-4">New to the network?</p>
+            <Link
+              to="/signup"
+              className="w-full inline-flex justify-center py-3.5 px-4 border-2 border-slate-100 rounded-xl text-xs font-black uppercase tracking-widest text-slate-700 hover:bg-slate-50 hover:border-slate-200 transition-all active:scale-95"
+            >
+              Create Digital Identity
+            </Link>
           </div>
         </div>
       </div>
-      
-      <footer className="mt-12 text-center text-xs text-gray-400">
-        &copy; 2024 FairGig Inc. All rights reserved. Professional Grade Microservices.
-      </footer>
     </div>
   );
 };

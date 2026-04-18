@@ -92,6 +92,26 @@ const Anomalies = () => {
                                         " {anomaly.suggestion} "
                                     </p>
 
+                                    {anomaly.earningRef && (
+                                        <div className="mt-4 p-4 bg-slate-50/80 rounded-2xl border border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                            <Group gap="sm">
+                                                <div className="bg-white p-2 rounded-xl shadow-sm border border-slate-100">
+                                                    <ShieldAlert size={16} className="text-slate-500" />
+                                                </div>
+                                                <div>
+                                                    <Text size="xs" fw={900} tt="uppercase" c="slate.4" tracking={1}>Flagged Source Record</Text>
+                                                    <Text size="sm" fw={700} c="slate.8">
+                                                        {anomaly.earningRef.platform} shift on {new Date(anomaly.earningRef.date).toLocaleDateString()}
+                                                    </Text>
+                                                </div>
+                                            </Group>
+                                            <div className="sm:text-right">
+                                                <Text size="xl" fw={900} className="italic text-slate-800 tracking-tight">₹{anomaly.earningRef.amount}</Text>
+                                                <Text size="xs" fw={700} c="slate.4">Reported Payout</Text>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <div className="mt-8 flex justify-end gap-3">
                                         <Button 
                                             variant="light" 

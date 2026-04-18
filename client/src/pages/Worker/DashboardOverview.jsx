@@ -140,8 +140,8 @@ const DashboardOverview = () => {
               <AreaChart data={trends}>
                 <defs>
                   <linearGradient id="colorEarn" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.1}/>
-                    <stop offset="95%" stopColor="#4f46e5" stopOpacity={0}/>
+                    <stop offset="5%" stopColor="#28e0b6" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#28e0b6" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -149,9 +149,9 @@ const DashboardOverview = () => {
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
                 <Tooltip 
                   contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'}}
-                  cursor={{stroke: '#4f46e5', strokeWidth: 2}}
+                  cursor={{stroke: '#28e0b6', strokeWidth: 2}}
                 />
-                <Area type="monotone" dataKey="amount" stroke="#4f46e5" strokeWidth={3} fillOpacity={1} fill="url(#colorEarn)" />
+                <Area type="monotone" dataKey="amount" stroke="#28e0b6" strokeWidth={3} fillOpacity={1} fill="url(#colorEarn)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -172,7 +172,7 @@ const DashboardOverview = () => {
                 />
                 <Bar dataKey="amount" radius={[8, 8, 0, 0]}>
                   {stats?.platformBreakdown?.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={['#6366f1', '#a855f7', '#3b82f6', '#10b981'][index % 4]} />
+                    <Cell key={`cell-${index}`} fill={['#28e0b6', '#0f172a', '#10b981', '#94a3b8'][index % 4]} />
                   ))}
                 </Bar>
               </BarChart>

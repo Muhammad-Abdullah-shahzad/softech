@@ -67,6 +67,12 @@ export const navigationConfig = {
         { label: 'Analytics', path: '/dashboard/advocate/analytics', icon: BarChart3 },
         { label: 'Community Board', path: '/dashboard/advocate/community', icon: Users },
       ]
+    },
+    {
+      title: 'Personal Node',
+      links: [
+        { label: 'Profile Settings', path: '/dashboard/advocate/profile', icon: Settings },
+      ]
     }
   ],
   support: [/* ... */]

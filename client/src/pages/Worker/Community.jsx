@@ -137,19 +137,28 @@ const Community = () => {
       {/* BROADCAST SECTION */}
       {broadcasts.length > 0 && (
         <div className="space-y-4">
-             <Text fw={900} size="xs" tt="uppercase" c="dimmed" tracking={1.2}>Advocate Announcements</Text>
+             <Text fw={900} size="xs" tt="uppercase" c="slate.4" tracking={1.5}>Advocate Announcements</Text>
              <SimpleGrid cols={{ base: 1, sm: 2 }}>
                 {broadcasts.slice(0, 2).map((b) => (
-                    <Card key={b._id} radius="24px" className="bg-gradient-to-br from-indigo-600 to-indigo-800 text-white shadow-xl shadow-indigo-100 overflow-hidden group">
-                        <Stack gap="xs" className="relative z-10">
+                    <Card key={b._id} radius="24px" withBorder className="bg-white border-slate-100 shadow-sm overflow-hidden relative">
+                        {/* Soft Teal accent glow */}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-[#28e0b6]/10 rounded-full -mr-16 -mt-16 blur-2xl z-0" />
+                        
+                        <Stack gap="sm" className="relative z-10">
                             <Group justify="space-between">
-                                <Badge color="indigo.4" variant="filled" size="xs">BROADCAST</Badge>
-                                <Text size="xs" opacity={0.6} fw={700}>{dayjs(b.createdAt).fromNow()}</Text>
+                                <span className="bg-[#28e0b6]/10 text-slate-800 border border-[#28e0b6]/20 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
+                                    Broadcast
+                                </span>
+                                <Text size="xs" c="slate.4" fw={600}>{dayjs(b.createdAt).fromNow()}</Text>
                             </Group>
-                            <Text fw={800} size="sm" className="leading-snug">{b.content}</Text>
-                            <Group gap={6} mt="xs">
-                                <ShieldAlert size={12} className="text-indigo-200" />
-                                <Text size="xs" fw={700} c="indigo.1">Verified Advocate Notification</Text>
+                            
+                            <Text fw={600} size="sm" c="slate.8" className="leading-relaxed">
+                                {b.content}
+                            </Text>
+                            
+                            <Group gap={6} mt="xs" className="pt-3 border-t border-slate-50">
+                                <ShieldAlert size={14} className="text-[#28e0b6]" />
+                                <Text size="xs" fw={700} c="slate.5">Verified Advocate Notice</Text>
                             </Group>
                         </Stack>
                     </Card>

@@ -84,7 +84,19 @@ exports.getWorkerAnalytics = async (req, res) => {
     let anomalies = [];
     allEarnings.forEach(e => {
         if(e.anomalies && e.anomalies.length > 0) {
-            anomalies = [...anomalies, ...e.anomalies];
+            const enrichedAnomalies = e.anomalies.map(a => {
+                const anomalyObj = typeof a.toObject === 'function' ? a.toObject() : a;
+                return {
+                    ...anomalyObj,
+                    earningRef: {
+                        id: e._id,
+                        platform: e.platform,
+                        amount: e.netAmount,
+                        date: e.shiftStart
+                    }
+                };
+            });
+            anomalies = [...anomalies, ...enrichedAnomalies];
         }
     });
 

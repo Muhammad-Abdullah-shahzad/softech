@@ -71,6 +71,7 @@ function App() {
           <Route index element={<Navigate to="analytics" replace />} />
           <Route path="analytics" element={<AdvocateOverview />} />
           <Route path="community" element={<AdvocateCommunity />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
         
         {/* Verifier Dashboard with Nested Routes */}

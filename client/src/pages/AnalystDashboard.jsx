@@ -19,9 +19,10 @@ const AnalystDashboard = () => {
     >
       <AppShell.Header>
         <Container size="xl" h="100%">
-          <Text fw={700} size="lg" style={{ lineHeight: '60px' }}>
-            FairGig Analytics Portal
-          </Text>
+          <div className="h-full flex items-center justify-between">
+            <img src="/logo.png" alt="FairGig" className="h-8 w-auto" />
+            <Text fw={900} size="sm" tt="uppercase" tracking={1.2} c="slate.4">Analytics Portal</Text>
+          </div>
         </Container>
       </AppShell.Header>
 
