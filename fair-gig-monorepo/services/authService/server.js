@@ -11,7 +11,6 @@ import { protect } from './middleware/authMiddleware.js';
 dotenv.config();
 
 const app = express();
-app.use("/",(req,res)=>{res.json({message:"working server"})})
 // Middleware
 app.use(express.json());
 // CORS must be configured to allow credentials (cookies) to be sent from the client

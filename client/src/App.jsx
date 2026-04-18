@@ -28,6 +28,11 @@ import FlaggedRecords from './pages/Verifier/FlaggedRecords';
 import VerificationHistory from './pages/Verifier/VerificationHistory';
 import VerifierAnalytics from './pages/Verifier/VerifierAnalytics';
 
+// Advocate Sub-pages
+import AdvocateDashboard from './pages/AdvocateDashboard';
+import AdvocateOverview from './pages/Advocate/AdvocateOverview';
+import AdvocateCommunity from './pages/Advocate/AdvocateCommunity';
+
 function App() {
 
   return (
@@ -61,8 +66,12 @@ function App() {
         {/* Support Dashboard */}
         <Route path="/dashboard/support" element={<SupportDashboard />} />
 
-        {/* Advocate Dashboard */}
-        <Route path="/dashboard/advocate" element={<AnalystDashboard />} />
+        {/* Advocate Dashboard with Nested Routes */}
+        <Route path="/dashboard/advocate" element={<AdvocateDashboard />}>
+          <Route index element={<Navigate to="analytics" replace />} />
+          <Route path="analytics" element={<AdvocateOverview />} />
+          <Route path="community" element={<AdvocateCommunity />} />
+        </Route>
         
         {/* Verifier Dashboard with Nested Routes */}
         <Route path="/dashboard/verifier" element={<VerifierDashboard />}>

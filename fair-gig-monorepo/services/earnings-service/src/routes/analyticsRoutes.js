@@ -7,5 +7,6 @@ router.get('/aggregates', analyticsController.getAggregates);
 router.get('/median', analyticsController.getMedian);
 router.get('/community-insights', analyticsController.getCommunityInsights);
 router.get('/verifier/overview', analyticsController.getVerifierAnalytics);
+router.get('/advocate/overview', analyticsController.getAdvocateAnalytics);
 
 module.exports = router;

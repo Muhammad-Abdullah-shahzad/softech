@@ -91,3 +91,84 @@ exports.getMyPosts = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+exports.updatePostStatus = async (req, res) => {
+  try {
+    const { status, tags } = req.body;
+    const update = {};
+    if (status) update.status = status;
+    if (tags) update.tags = tags;
+
+    const post = await CommunityPost.findByIdAndUpdate(
+      req.params.id,
+      update,
+      { new: true, runValidators: true }
+    );
+
+    if (!post) {
+      return res.status(404).json({ success: false, message: 'Post not found' });
+    }
+
+    res.status(200).json({ success: true, data: post });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+const Broadcast = require('../models/Broadcast');
+
+exports.getAdvocateStats = async (req, res) => {
+  try {
+    // 1. Most reported issue (Category)
+    const categoryStats = await CommunityPost.aggregate([
+      { $group: { _id: "$category", count: { $sum: 1 } } },
+      { $sort: { count: -1 } }
+    ]);
+
+    // 2. Rising Issue (Simplified: platform with most growth in last 7 days vs prev 7)
+    // For now, just show Platform with highest count
+    const platformStats = await CommunityPost.aggregate([
+      { $group: { _id: "$platform", count: { $sum: 1 } } },
+      { $sort: { count: -1 } }
+    ]);
+
+    // 3. Mini Trend (last 7 days counts)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const trend = await CommunityPost.aggregate([
+      { $match: { createdAt: { $gte: sevenDaysAgo } } },
+      { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, count: { $sum: 1 } } },
+      { $sort: { "_id": 1 } }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        mostReported: categoryStats[0],
+        risingIssue: platformStats[0],
+        trend
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+exports.createBroadcast = async (req, res) => {
+  try {
+    const { content, author } = req.body;
+    const broadcast = await Broadcast.create({ content, author });
+    res.status(201).json({ success: true, data: broadcast });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+exports.getBroadcasts = async (req, res) => {
+    try {
+        const data = await Broadcast.find().sort({ createdAt: -1 }).limit(5);
+        res.status(200).json({ success: true, data });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};

@@ -37,6 +37,17 @@ const communityPostSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  status: {
+    type: String,
+    enum: ['open', 'resolved', 'ignored', 'escalated'],
+    default: 'open'
+  },
+  tags: [{
+    type: String
+  }],
+  metadata: {
+     similarCount: { type: Number, default: 0 }
+  },
   createdAt: {
     type: Date,
     default: Date.now

@@ -63,7 +63,8 @@ const Earnings = () => {
         grossAmount: formData.grossEarnings,
         deductions: [{ type: 'Generic Deduction', amount: formData.deductions }],
         netAmount: netAmount,
-        verificationStatus: 'unverified'
+        verificationStatus: 'unverified',
+        city: user.city || 'Unknown'
       };
 
       if (editingItem) {

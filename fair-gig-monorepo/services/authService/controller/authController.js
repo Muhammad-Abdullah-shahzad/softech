@@ -34,7 +34,7 @@ export const signup = async (req, res) => {
 
     // 4. Generate JWT token
     const token = jwt.sign(
-      { id: newUser._id, email: newUser.email, role: newUser.role },
+      { id: newUser._id, email: newUser.email, role: newUser.role, city: newUser.city },
       process.env.JWT_SECRET || 'fallback_secret',
       { expiresIn: '1d' }
     );
@@ -53,7 +53,8 @@ export const signup = async (req, res) => {
         id: newUser._id,
         fullName: newUser.fullName,
         email: newUser.email,
-        role: newUser.role
+        role: newUser.role,
+        city: newUser.city
       }
     });
 
@@ -86,7 +87,7 @@ export const login = async (req, res) => {
 
     // 3. Generate JWT token
     const token = jwt.sign(
-      { id: user._id, email: user.email, role: user.role },
+      { id: user._id, email: user.email, role: user.role, city: user.city },
       process.env.JWT_SECRET || 'fallback_secret',
       { expiresIn: '1d' }
     );
@@ -106,7 +107,8 @@ export const login = async (req, res) => {
         id: user._id,
         fullName: user.fullName,
         email: user.email,
-        role: user.role
+        role: user.role,
+        city: user.city
       }
     });
   } catch (error) {

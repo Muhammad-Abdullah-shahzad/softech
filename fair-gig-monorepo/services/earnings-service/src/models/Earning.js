@@ -58,8 +58,7 @@ const earningSchema = new mongoose.Schema({
   },
   city: {
     type: String,
-    required: true,
-    default: 'Lahore'
+    required: true
   }
 }, {
   timestamps: true

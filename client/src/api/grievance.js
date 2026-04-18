@@ -11,3 +11,7 @@ export const getCommunityPosts = (params) => api.get(COMMUNITY_URL, { params });
 export const createCommunityPost = (data) => api.post(COMMUNITY_URL, data);
 export const getCommunityTrending = () => api.get(`${COMMUNITY_URL}/trending`);
 export const getMyCommunityPosts = (workerId) => api.get(`${COMMUNITY_URL}/my-posts?workerId=${workerId}`);
+export const updatePostStatus = (id, data) => api.patch(`${COMMUNITY_URL}/${id}/status`, data);
+export const getAdvocateCommunityStats = () => api.get(`${COMMUNITY_URL}/advocate-stats`);
+export const createBroadcast = (data) => api.post(`${COMMUNITY_URL}/broadcast`, data);
+export const getBroadcasts = () => api.get(`${COMMUNITY_URL}/broadcasts`);

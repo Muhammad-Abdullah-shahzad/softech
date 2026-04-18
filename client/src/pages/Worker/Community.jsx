@@ -18,7 +18,8 @@ import {
     getCommunityPosts, 
     createCommunityPost, 
     getCommunityTrending, 
-    getMyCommunityPosts 
+    getMyCommunityPosts,
+    getBroadcasts
 } from '../../api/grievance';
 import { 
     Badge, 
@@ -37,7 +38,8 @@ import {
     ActionIcon, 
     SegmentedControl,
     Loader,
-    Divider
+    Divider,
+    SimpleGrid
 } from '@mantine/core';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -45,72 +47,73 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 
 const Community = () => {
-  const [posts, setPosts] = useState([]);
-  const [trending, setTrending] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [view, setView] = useState('all'); // 'all' or 'my'
-  
-  // Form State
-  const [formData, setFormData] = useState({
-    platform: '',
-    category: '',
-    title: '',
-    description: '',
-    city: 'Lahore'
-  });
-  
-  // Filter State
-  const [filters, setFilters] = useState({
-    platform: '',
-    category: '',
-    search: ''
-  });
+    const [posts, setPosts] = useState([]);
+    const [broadcasts, setBroadcasts] = useState([]);
+    const [trending, setTrending] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [showModal, setShowModal] = useState(false);
+    const [view, setView] = useState('all');
+    
+    const [formData, setFormData] = useState({
+        platform: '',
+        category: '',
+        title: '',
+        description: '',
+        city: 'Lahore'
+    });
+    
+    const [filters, setFilters] = useState({
+        platform: '',
+        category: '',
+        search: ''
+    });
 
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const workerId = user.id || user.email || 'worker_01';
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const workerId = user.id || user.email || 'worker_01';
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const [postRes, trendRes] = await Promise.all([
-        view === 'all' ? getCommunityPosts(filters) : getMyCommunityPosts(workerId),
-        getCommunityTrending()
-      ]);
-      setPosts(postRes.data.data);
-      setTrending(trendRes.data.data);
-    } catch (err) {
-      console.error('Error fetching community data:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const [postRes, trendRes, broadRes] = await Promise.all([
+                view === 'all' ? getCommunityPosts(filters) : getMyCommunityPosts(workerId),
+                getCommunityTrending(),
+                getBroadcasts()
+            ]);
+            setPosts(postRes.data.data);
+            setTrending(trendRes.data.data);
+            setBroadcasts(broadRes.data.data);
+        } catch (err) {
+            console.error('Error fetching community data:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-  useEffect(() => {
-    fetchData();
-  }, [view, filters.platform, filters.category, filters.search]);
+    useEffect(() => {
+        fetchData();
+    }, [view, filters.platform, filters.category, filters.search]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await createCommunityPost({ ...formData, workerId });
-      setShowModal(false);
-      setFormData({ platform: '', category: '', title: '', description: '', city: user.city || 'Lahore' });
-      fetchData();
-    } catch (err) {
-      alert('Failed to post. Please try again.');
-    }
-  };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await createCommunityPost({ ...formData, workerId });
+            setShowModal(false);
+            setFormData({ platform: '', category: '', title: '', description: '', city: user.city || 'Lahore' });
+            fetchData();
+        } catch (err) {
+            alert('Failed to post. Please try again.');
+        }
+    };
 
-  const getCategoryColor = (cat) => {
-    switch(cat) {
-        case 'Complaint': return 'red';
-        case 'Rate Change': return 'yellow';
-        case 'Deactivation': return 'dark';
-        case 'Payment Issue': return 'orange';
-        default: return 'blue';
-    }
-  };
+    const getCategoryColor = (cat) => {
+        switch(cat) {
+            case 'Complaint': return 'red';
+            case 'Rate Change': return 'yellow';
+            case 'Deactivation': return 'dark';
+            case 'Payment Issue': return 'orange';
+            default: return 'blue';
+        }
+    };
 
   return (
     <div className="max-w-6xl mx-auto space-y-10 pb-20">
@@ -130,6 +133,30 @@ const Community = () => {
             Post Anonymous Insight
         </Button>
       </header>
+
+      {/* BROADCAST SECTION */}
+      {broadcasts.length > 0 && (
+        <div className="space-y-4">
+             <Text fw={900} size="xs" tt="uppercase" c="dimmed" tracking={1.2}>Advocate Announcements</Text>
+             <SimpleGrid cols={{ base: 1, sm: 2 }}>
+                {broadcasts.slice(0, 2).map((b) => (
+                    <Card key={b._id} radius="24px" className="bg-gradient-to-br from-indigo-600 to-indigo-800 text-white shadow-xl shadow-indigo-100 overflow-hidden group">
+                        <Stack gap="xs" className="relative z-10">
+                            <Group justify="space-between">
+                                <Badge color="indigo.4" variant="filled" size="xs">BROADCAST</Badge>
+                                <Text size="xs" opacity={0.6} fw={700}>{dayjs(b.createdAt).fromNow()}</Text>
+                            </Group>
+                            <Text fw={800} size="sm" className="leading-snug">{b.content}</Text>
+                            <Group gap={6} mt="xs">
+                                <ShieldAlert size={12} className="text-indigo-200" />
+                                <Text size="xs" fw={700} c="indigo.1">Verified Advocate Notification</Text>
+                            </Group>
+                        </Stack>
+                    </Card>
+                ))}
+             </SimpleGrid>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
         

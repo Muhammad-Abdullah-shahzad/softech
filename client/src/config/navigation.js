@@ -60,6 +60,14 @@ export const navigationConfig = {
       ]
     }
   ],
-  analyst: [/* ... */],
+  analyst: [
+    {
+      title: 'Advocate Intelligence',
+      links: [
+        { label: 'Analytics', path: '/dashboard/advocate/analytics', icon: BarChart3 },
+        { label: 'Community Board', path: '/dashboard/advocate/community', icon: Users },
+      ]
+    }
+  ],
   support: [/* ... */]
 };

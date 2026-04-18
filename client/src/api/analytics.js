@@ -8,3 +8,4 @@ export const getCityMedian = (city) => api.get(`${ANALYTICS_URL}/city-median?cit
 export const getTrends = (workerId, period = 'weekly') => api.get(`${ANALYTICS_URL}/trends/${workerId}?period=${period}`);
 export const getCommunityInsights = () => api.get(`${ANALYTICS_URL}/community-insights`);
 export const getVerifierOverview = () => api.get(`${ANALYTICS_URL}/verifier/overview`);
+export const getAdvocateOverview = () => api.get(`${ANALYTICS_URL}/advocate/overview`);
