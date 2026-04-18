@@ -26,10 +26,9 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Save user info to localStorage if needed (cookies handle the session)
+        localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         
-        // Redirect based on role
         if (data.user.role === 'worker') navigate('/dashboard/worker');
         else if (data.user.role === 'advocate') navigate('/dashboard/advocate');
         else navigate('/dashboard/verifier');

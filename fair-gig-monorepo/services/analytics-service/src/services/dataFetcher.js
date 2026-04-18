@@ -21,6 +21,16 @@ class DataFetcher {
     }
   }
 
+  async fetchWorkerEarnings(workerId) {
+    try {
+      const response = await axios.get(`${this.urls.earnings}/api/earnings?workerId=${workerId}`);
+      return response.data.data;
+    } catch (error) {
+      console.error(`Failed to fetch earnings for worker ${workerId}:`, error.message);
+      return [];
+    }
+  }
+
   async fetchAllGrievances() {
     try {
       const response = await axios.get(`${this.urls.grievance}/api/grievances`);

@@ -1,35 +1,19 @@
+import api from './axiosConfig';
+
 const EARNINGS_URL = import.meta.env.VITE_EARNINGS_URL || 'http://localhost:5002/api/earnings';
 
-/**
- * API service for worker earnings usando standard Fetch.
- */
-export const addEarning = async (data) => {
-  try {
-    const response = await fetch(EARNINGS_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.message || 'Failed to add earning');
-    return result;
-  } catch (error) {
-    console.error('API Error (addEarning):', error.message);
-    throw error;
-  }
+export const getEarnings = (workerId, status, platform) => {
+    let url = `${EARNINGS_URL}?`;
+    if (workerId) url += `workerId=${workerId}&`;
+    if (status) url += `status=${status}&`;
+    if (platform) url += `platform=${platform}&`;
+    return api.get(url);
 };
-
-export const getEarnings = async (workerId) => {
-  try {
-    const response = await fetch(`${EARNINGS_URL}?workerId=${workerId}`);
-    const result = await response.json();
-    if (!response.ok) throw new Error(result.message || 'Failed to fetch earnings');
-    return result;
-  } catch (error) {
-    console.error('API Error (getEarnings):', error.message);
-    throw error;
-  }
-};
+export const addEarning = (data) => api.post(EARNINGS_URL, data);
+export const getEarningById = (id) => api.get(`${EARNINGS_URL}/${id}`);
+export const getVerifierStats = () => api.get(`${EARNINGS_URL}/stats`);
+export const updateEarning = (id, data) => api.patch(`${EARNINGS_URL}/${id}`, data);
+export const deleteEarning = (id) => api.delete(`${EARNINGS_URL}/${id}`);
+export const uploadVerification = (id, formData) => api.post(`${EARNINGS_URL}/${id}/upload`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+});

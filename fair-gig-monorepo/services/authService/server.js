@@ -23,7 +23,16 @@ app.use(cookieParser());
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/softech')
-  .then(() => console.log('[Auth Service] Connected to MongoDB'))
+  .then(async () => {
+    console.log('[Auth Service] Connected to MongoDB');
+    try {
+      // Drop legacy index from old schemas that causes E11000 duplicate key errors
+      await mongoose.connection.collection('users').dropIndex('username_1');
+      console.log('Legacy username index dropped successfully');
+    } catch (e) {
+      // Index might not exist anymore, ignore
+    }
+  })
   .catch(err => console.error('[Auth Service] MongoDB connection error:', err));
 
 // Routes

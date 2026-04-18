@@ -30,10 +30,19 @@ exports.createEarning = async (req, res) => {
 
 exports.getEarningsHistory = async (req, res) => {
   try {
-    const { workerId } = req.query;
-    const query = workerId ? { workerId } : {};
+    const { workerId, status, platform, sortBy, order } = req.query;
+    
+    let query = {};
+    if (workerId) query.workerId = workerId;
+    if (status) query.verificationStatus = status;
+    if (platform) query.platform = platform;
 
-    const earnings = await Earning.find(query).sort({ shiftStart: -1 });
+    let sort = { createdAt: -1 }; // Default: newest first
+    if (sortBy) {
+        sort = { [sortBy]: order === 'asc' ? 1 : -1 };
+    }
+
+    const earnings = await Earning.find(query).sort(sort);
 
     res.status(200).json({
       success: true,
@@ -76,5 +85,66 @@ exports.updateVerificationStatus = async (req, res) => {
     res.status(200).json({ success: true, data: earning });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+exports.updateEarning = async (req, res) => {
+  try {
+    const earning = await Earning.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!earning) {
+      return res.status(404).json({ success: false, message: 'Earning not found' });
+    }
+
+    res.status(200).json({ success: true, data: earning });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+exports.getVerifierStats = async (req, res) => {
+  try {
+    const stats = await Earning.aggregate([
+      {
+        $group: {
+          _id: "$verificationStatus",
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const dailyTrends = await Earning.aggregate([
+      {
+        $match: { verificationStatus: { $ne: 'unverified' } }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$updatedAt" } },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } },
+      { $limit: 30 }
+    ]);
+
+    const platformStats = await Earning.aggregate([
+      {
+        $group: {
+          _id: { platform: "$platform", status: "$verificationStatus" },
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: { stats, dailyTrends, platformStats }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
