@@ -1,183 +1,334 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Users, 
-  TrendingDown, 
   TrendingUp, 
   MessageSquare, 
   MapPin, 
   ShieldAlert,
-  ArrowUpRight
+  ArrowUpRight,
+  Plus,
+  Search,
+  Filter,
+  ThumbsUp,
+  Clock,
+  ChevronRight,
+  X
 } from 'lucide-react';
-import { getCommunityInsights } from '../../api/analytics';
-import { getTrendingGrievances } from '../../api/grievance';
-import { Badge, Progress, Avatar, Group, Text, Paper, Button } from '@mantine/core';
+import { 
+    getCommunityPosts, 
+    createCommunityPost, 
+    getCommunityTrending, 
+    getMyCommunityPosts 
+} from '../../api/grievance';
+import { 
+    Badge, 
+    Progress, 
+    Avatar, 
+    Group, 
+    Text, 
+    Paper, 
+    Button, 
+    TextInput, 
+    Select, 
+    Textarea, 
+    Modal, 
+    Card, 
+    Stack, 
+    ActionIcon, 
+    SegmentedControl,
+    Loader,
+    Divider
+} from '@mantine/core';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 const Community = () => {
-  const [insights, setInsights] = useState(null);
-  const [trendingGrievances, setTrendingGrievances] = useState([]);
+  const [posts, setPosts] = useState([]);
+  const [trending, setTrending] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [view, setView] = useState('all'); // 'all' or 'my'
+  
+  // Form State
+  const [formData, setFormData] = useState({
+    platform: '',
+    category: '',
+    title: '',
+    description: '',
+    city: 'Lahore'
+  });
+  
+  // Filter State
+  const [filters, setFilters] = useState({
+    platform: '',
+    category: '',
+    search: ''
+  });
+
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const workerId = user.id || user.email || 'worker_01';
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [postRes, trendRes] = await Promise.all([
+        view === 'all' ? getCommunityPosts(filters) : getMyCommunityPosts(workerId),
+        getCommunityTrending()
+      ]);
+      setPosts(postRes.data.data);
+      setTrending(trendRes.data.data);
+    } catch (err) {
+      console.error('Error fetching community data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchCommunityData = async () => {
-      try {
-        const [insightsRes, grievanceRes] = await Promise.all([
-          getCommunityInsights(),
-          getTrendingGrievances()
-        ]);
-        setInsights(insightsRes.data.data);
-        setTrendingGrievances(grievanceRes.data.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCommunityData();
-  }, []);
+    fetchData();
+  }, [view, filters.platform, filters.category, filters.search]);
 
-  if (loading) return <div>Loading Community Insights...</div>;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await createCommunityPost({ ...formData, workerId });
+      setShowModal(false);
+      setFormData({ platform: '', category: '', title: '', description: '', city: user.city || 'Lahore' });
+      fetchData();
+    } catch (err) {
+      alert('Failed to post. Please try again.');
+    }
+  };
+
+  const getCategoryColor = (cat) => {
+    switch(cat) {
+        case 'Complaint': return 'red';
+        case 'Rate Change': return 'yellow';
+        case 'Deactivation': return 'dark';
+        case 'Payment Issue': return 'orange';
+        default: return 'blue';
+    }
+  };
 
   return (
-    <div className="space-y-10 pb-12">
-      <header>
-        <h2 className="text-2xl font-bold text-slate-900 border-none">Community Insights</h2>
-        <p className="text-slate-500 text-sm italic">Aggregate, anonymized data from the FairGig network.</p>
+    <div className="max-w-6xl mx-auto space-y-10 pb-20">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div>
+          <h2 className="text-3xl font-black text-slate-900 border-none tracking-tight">Worker Community</h2>
+          <p className="text-slate-500 font-medium">Anonymous insights & support from 1,200+ gig partners.</p>
+        </div>
+        <Button 
+            leftSection={<Plus size={18} />} 
+            size="lg" 
+            radius="xl" 
+            color="indigo" 
+            onClick={() => setShowModal(true)}
+            className="shadow-xl shadow-indigo-100 hover:-translate-y-1 transition-transform"
+        >
+            Post Anonymous Insight
+        </Button>
       </header>
 
-      {/* Row 1: Market Pulse */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <Paper p="xl" radius="32px" withBorder className="bg-slate-900 text-white border-none">
-            <h3 className="text-indigo-400 text-xs font-black uppercase tracking-widest mb-6">Market Pulse</h3>
-            <div className="space-y-6">
-                <div>
-                    <div className="flex justify-between mb-2">
-                        <Text size="sm" c="dimmed">Uber Availability</Text>
-                        <Text size="sm" fw={700}>High (88%)</Text>
-                    </div>
-                    <Progress value={88} color="indigo" size="sm" radius="xl" />
-                </div>
-                <div>
-                    <div className="flex justify-between mb-2">
-                        <Text size="sm" c="dimmed">Zomato Incentives</Text>
-                        <Text size="sm" fw={700}>Dropping (-12%)</Text>
-                    </div>
-                    <Progress value={45} color="rose" size="sm" radius="xl" />
-                </div>
-                <div>
-                    <div className="flex justify-between mb-2">
-                        <Text size="sm" c="dimmed">Swiggy Verification Speed</Text>
-                        <Text size="sm" fw={700}>Improving</Text>
-                    </div>
-                    <Progress value={72} color="emerald" size="sm" radius="xl" />
-                </div>
-            </div>
-        </Paper>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
+        
+        {/* Sidebar: Filters & Trends */}
+        <aside className="space-y-8 order-2 lg:order-1">
+            
+            <Paper p="xl" radius="32px" withBorder className="border-slate-100 shadow-sm space-y-6">
+                <Text fw={900} size="xs" tt="uppercase" c="dimmed" tracking={1.5}>Filter Feed</Text>
+                <Stack>
+                    <Select 
+                        placeholder="All Platforms" 
+                        data={['Uber', 'Careem', 'Zomato', 'Swiggy', 'Foodpanda', 'Bykea']} 
+                        value={filters.platform}
+                        onChange={(val) => setFilters(f => ({...f, platform: val}))}
+                        radius="md"
+                        clearable
+                    />
+                    <Select 
+                        placeholder="All Categories" 
+                        data={['Rate Change', 'Complaint', 'Deactivation', 'Payment Issue', 'Support Request']} 
+                        value={filters.category}
+                        onChange={(val) => setFilters(f => ({...f, category: val}))}
+                        radius="md"
+                        clearable
+                    />
+                    <TextInput 
+                        placeholder="Search keywords..." 
+                        leftSection={<Search size={14} />}
+                        value={filters.search}
+                        onChange={(e) => setFilters(f => ({...f, search: e.target.value}))}
+                        radius="md"
+                    />
+                </Stack>
+                <Button variant="subtle" color="slate" fullWidth onClick={() => setFilters({ platform: '', category: '', search: '' })}>
+                    Clear All
+                </Button>
+            </Paper>
 
-        <div className="md:col-span-2 bg-indigo-50 rounded-[32px] p-8 flex flex-col justify-between border border-indigo-100">
-             <div className="flex justify-between items-start">
-                <div className="space-y-1">
-                    <h3 className="text-lg font-bold text-indigo-900 border-none">Worker Sentiment</h3>
-                    <p className="text-sm text-indigo-700">How your peers feel about current rates in Mumbai.</p>
-                </div>
-                <Users className="text-indigo-600 opacity-20" size={48} />
-             </div>
-             
-             <div className="flex gap-12 mt-8">
-                <div>
-                    <p className="text-4xl font-black text-indigo-600 italic">68%</p>
-                    <p className="text-sm font-bold text-indigo-900 mt-1 uppercase tracking-tighter">Satisfied</p>
-                </div>
-                <div>
-                    <p className="text-4xl font-black text-rose-500 italic">22%</p>
-                    <p className="text-sm font-bold text-indigo-900 mt-1 uppercase tracking-tighter">Concerned</p>
-                </div>
-                <div>
-                    <p className="text-4xl font-black text-slate-400 italic">10%</p>
-                    <p className="text-sm font-bold text-indigo-900 mt-1 uppercase tracking-tighter">Neutral</p>
-                </div>
-             </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Trending Issues */}
-        <div className="space-y-6">
-            <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2 px-2 border-none">
-                <ShieldAlert className="text-rose-500" size={24} />
-                Trending Issues
-            </h3>
-            <div className="space-y-3">
-                {trendingGrievances.map((g, idx) => (
-                    <div key={idx} className="bg-white p-5 rounded-3xl border border-slate-100 flex justify-between items-center group hover:border-rose-200 transition-colors">
-                        <div className="flex gap-4 items-center">
-                            <div className="w-10 h-10 bg-rose-50 rounded-2xl flex items-center justify-center">
-                                <MessageSquare className="text-rose-600" size={20} />
-                            </div>
-                            <div>
-                                <h4 className="font-bold text-slate-900 text-sm group-hover:text-rose-700">{g.title}</h4>
-                                <p className="text-xs text-slate-500">{g.affectedCount}+ workers reported this in {g.platform}</p>
-                            </div>
+            {trending && (
+                <Paper p="xl" radius="32px" className="bg-slate-900 text-white border-none shadow-2xl space-y-6">
+                    <Group justify="space-between">
+                        <Text fw={900} size="xs" tt="uppercase" c="indigo.4" tracking={1.5}>Market Heatmap</Text>
+                        <TrendingUp size={16} className="text-indigo-400" />
+                    </Group>
+                    
+                    <div className="space-y-4">
+                        <div className="p-4 bg-white/5 rounded-2xl border border-white/10">
+                            <Text size="xs" c="dimmed" fw={700}>MOST REPORTED ISSUE</Text>
+                            <Text fw={900} size="lg" className="text-rose-400">{trending.mostReportedIssue}</Text>
                         </div>
-                        <ArrowUpRight size={18} className="text-slate-300 group-hover:text-rose-500" />
-                    </div>
-                ))}
-            </div>
-        </div>
 
-        {/* Global Rate Changes */}
-        <div className="space-y-6">
-            <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2 px-2 border-none">
-                <TrendingUp className="text-indigo-500" size={24} />
-                Global Rate Changes
-            </h3>
-            <div className="bg-white rounded-3xl border border-slate-100 divide-y divide-slate-50">
-                {insights?.rateChanges?.map((item, idx) => (
-                    <div key={idx} className="p-6 flex justify-between items-center">
-                        <Group>
-                            <Avatar color={item.change > 0 ? 'teal' : 'red'} radius="xl">
-                                {item.change > 0 ? <TrendingUp size={16}/> : <TrendingDown size={16}/>}
-                            </Avatar>
-                            <div>
-                                <h4 className="font-bold text-slate-800 text-sm">{item.platform}</h4>
-                                <Text size="xs" color="dimmed" className="flex items-center gap-1">
-                                    <MapPin size={10} /> {item.city}
-                                </Text>
-                            </div>
-                        </Group>
-                        <div className="text-right">
-                            <p className={`font-black italic ${item.change > 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                                {item.change > 0 ? '+' : ''}{item.change}%
-                            </p>
-                            <p className="text-[10px] uppercase font-bold text-slate-400">Past 7 Days</p>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
-      </div>
-
-      {/* Hero Insights */}
-      <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-[40px] p-12 text-white overflow-hidden relative">
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-              <div className="space-y-6">
-                  <h3 className="text-4xl font-black italic tracking-tight leading-tight">Fairness Score: 7.4/10</h3>
-                  <p className="text-indigo-100 text-lg opacity-80 leading-relaxed">
-                      Mumbai's gig economy is currently seeing a "Fair" rating. Payment delays reduced by 14% this month across major platforms.
-                  </p>
-                  <Button variant="white" color="indigo" radius="xl" size="lg" px={40}>View Full Report</Button>
-              </div>
-              <div className="hidden md:flex justify-end">
-                    <div className="grid grid-cols-2 gap-4">
-                        {[1,2,3,4].map(i => (
-                            <div key={i} className="w-24 h-24 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 flex items-center justify-center font-bold text-2xl italic">
-                                F
+                        <Divider color="white" opacity={0.1} label="Top Platforms" labelPosition="center" />
+                        
+                        {trending.topPlatforms.map((p, i) => (
+                            <div key={i} className="flex justify-between items-center">
+                                <Text size="sm" fw={600}>{p._id}</Text>
+                                <Badge variant="light" color="indigo">{p.count} posts</Badge>
                             </div>
                         ))}
                     </div>
-              </div>
-          </div>
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl" />
+                </Paper>
+            )}
+        </aside>
+
+        {/* Main Feed */}
+        <section className="lg:col-span-3 space-y-8 order-1 lg:order-2">
+            
+            <SegmentedControl 
+                value={view} 
+                onChange={setView}
+                data={[
+                    { label: 'Community Feed', value: 'all' },
+                    { label: 'My Anonymous Posts', value: 'my' }
+                ]}
+                radius="xl"
+                size="md"
+                className="bg-slate-100 p-1 mb-4"
+            />
+
+            {loading ? (
+                <div className="h-64 flex items-center justify-center">
+                    <Loader size="xl" color="indigo" type="dots" />
+                </div>
+            ) : posts.length === 0 ? (
+                <Paper p={60} radius="40px" withBorder className="border-dashed border-2 text-center bg-slate-50/50">
+                    <MessageSquare size={48} className="mx-auto text-slate-300 opacity-50 mb-4" />
+                    <Text fw={700} c="dimmed">No posts found matching your current view or filters.</Text>
+                </Paper>
+            ) : (
+                <div className="grid grid-cols-1 gap-6">
+                    {posts.map((post) => (
+                        <Card key={post._id} radius="32px" padding="30px" withBorder className="hover:border-indigo-200 transition-all hover:shadow-lg hover:shadow-indigo-50 group">
+                            <Stack gap="lg">
+                                <div className="flex justify-between items-start">
+                                    <Group>
+                                        <Avatar radius="xl" color="indigo" variant="light">
+                                            {post.anonymousId.split('#')[1]}
+                                        </Avatar>
+                                        <div>
+                                            <Text size="sm" fw={900} className="group-hover:text-indigo-600 transition-colors">{post.anonymousId}</Text>
+                                            <Group gap={6}>
+                                                <Clock size={12} className="text-slate-400" />
+                                                <Text size="xs" c="dimmed">{dayjs(post.createdAt).fromNow()}</Text>
+                                                <Text size="xs" opacity={0.3}>•</Text>
+                                                <MapPin size={12} className="text-slate-400" />
+                                                <Text size="xs" c="dimmed">{post.city}</Text>
+                                            </Group>
+                                        </div>
+                                    </Group>
+                                    <Badge color={getCategoryColor(post.category)} variant="filled" py={12} px={16} radius="md">
+                                        {post.category}
+                                    </Badge>
+                                </div>
+
+                                <Stack gap={8}>
+                                    <h4 className="text-xl font-black text-slate-800 border-none">{post.title}</h4>
+                                    <Text size="md" c="slate.7" className="leading-relaxed">
+                                        {post.description}
+                                    </Text>
+                                </Stack>
+
+                                <div className="flex justify-between items-center pt-4 border-t border-slate-50">
+                                    <Badge variant="outline" color="slate" size="lg" radius="md">{post.platform}</Badge>
+                                    <Group gap="xs">
+                                        <ActionIcon variant="light" color="indigo" size="lg" radius="md">
+                                            <ThumbsUp size={18} />
+                                        </ActionIcon>
+                                        <Text size="xs" fw={700} c="dimmed">{post.upvotes} found this helpful</Text>
+                                    </Group>
+                                </div>
+                            </Stack>
+                        </Card>
+                    ))}
+                </div>
+            )}
+        </section>
       </div>
+
+      {/* Post Modal */}
+      <Modal 
+        opened={showModal} 
+        onClose={() => setShowModal(false)} 
+        title={<Text fw={900} size="xl">Share Anonymous Insight</Text>}
+        radius="32px"
+        padding={40}
+        size="lg"
+        overlayProps={{ blur: 5, opacity: 0.3 }}
+      >
+        <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+                <Select 
+                    label="Platform" 
+                    placeholder="Select Platform"
+                    data={['Uber', 'Careem', 'Zomato', 'Swiggy', 'Foodpanda', 'Bykea']}
+                    required
+                    value={formData.platform}
+                    onChange={(val) => setFormData(f => ({...f, platform: val}))}
+                    radius="md"
+                />
+                <Select 
+                    label="Category" 
+                    placeholder="Issue Category"
+                    data={['Rate Change', 'Complaint', 'Deactivation', 'Payment Issue', 'Support Request']}
+                    required
+                    value={formData.category}
+                    onChange={(val) => setFormData(f => ({...f, category: val}))}
+                    radius="md"
+                />
+            </div>
+            <TextInput 
+                label="Headline" 
+                placeholder="What's happening?" 
+                required
+                value={formData.title}
+                onChange={(e) => setFormData(f => ({...f, title: e.target.value}))}
+                radius="md"
+            />
+            <Textarea 
+                label="Description" 
+                placeholder="Details of the issue or insight..." 
+                minRows={4}
+                required
+                value={formData.description}
+                onChange={(e) => setFormData(f => ({...f, description: e.target.value}))}
+                radius="md"
+            />
+            <TextInput 
+                label="City / Zone" 
+                value={formData.city}
+                disabled
+                radius="md"
+            />
+            
+            <Group justify="flex-end" mt="xl">
+                <Button variant="subtle" color="slate" onClick={() => setShowModal(false)} radius="md">Cancel</Button>
+                <Button type="submit" color="indigo" px={40} radius="md" loading={loading}>Post Anonymously</Button>
+            </Group>
+        </form>
+      </Modal>
     </div>
   );
 };

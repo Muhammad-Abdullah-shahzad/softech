@@ -123,8 +123,9 @@ const Earnings = () => {
     switch (status) {
       case 'verified': return <Badge color="green" leftSection={<CheckCircle2 size={12}/>}>Verified</Badge>;
       case 'flagged': return <Badge color="red" leftSection={<AlertTriangle size={12}/>}>Flagged</Badge>;
+      case 'unverifiable': return <Badge color="gray" leftSection={<FileX size={12}/>}>Rejected</Badge>;
       case 'pending': return <Badge color="yellow" leftSection={<Clock size={12}/>}>Pending</Badge>;
-      default: return <Badge color="gray">Unknown</Badge>;
+      default: return <Badge color="gray" variant="outline">Unverified</Badge>;
     }
   };
 

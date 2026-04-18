@@ -206,3 +206,67 @@ exports.getCommunityInsights = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+exports.getVerifierAnalytics = async (req, res) => {
+  try {
+    // 1. Verification Activity (Daily count of statuses changed from pending)
+    const activity = await Earning.aggregate([
+      { $match: { verificationStatus: { $ne: 'pending' } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$updatedAt" } },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { "_id": 1 } },
+      { $project: { date: "$_id", count: 1, _id: 0 } }
+    ]);
+
+    // 2. Decision Breakdown
+    const decisionsRaw = await Earning.aggregate([
+      { $group: { _id: "$verificationStatus", count: { $sum: 1 } } }
+    ]);
+    const decisions = {
+      verified: decisionsRaw.find(d => d._id === 'verified')?.count || 0,
+      flagged: decisionsRaw.find(d => d._id === 'flagged')?.count || 0,
+      unverifiable: decisionsRaw.find(d => d._id === 'unverifiable')?.count || 0,
+      pending: decisionsRaw.find(d => d._id === 'pending')?.count || 0
+    };
+
+    // 3. Platform Risk (Flagged counts per platform)
+    const platformRisk = await Earning.aggregate([
+      { $match: { verificationStatus: 'flagged' } },
+      { $group: { _id: "$platform", flags: { $sum: 1 } } },
+      { $sort: { flags: -1 } },
+      { $project: { platform: "$_id", flags: 1, _id: 0 } }
+    ]);
+
+    // 4. Suspicious Patterns (Anomaly Types)
+    const anomalyPatterns = await Earning.aggregate([
+      { $match: { "anomalies.0": { $exists: true } } },
+      { $unwind: "$anomalies" },
+      { $group: { _id: "$anomalies.type", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $project: { type: "$_id", count: 1, _id: 0 } }
+    ]);
+
+    // 5. Workload
+    const workload = {
+      pending: decisions.pending,
+      reviewed: decisions.verified + decisions.flagged + decisions.unverifiable
+    };
+
+    res.status(200).json({
+      success: true,
+      data: {
+        activity,
+        decisions,
+        platformRisk,
+        anomalyPatterns,
+        workload
+      }
+    });
+
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

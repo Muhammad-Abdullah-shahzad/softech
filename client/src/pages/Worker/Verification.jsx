@@ -27,7 +27,8 @@ const Verification = () => {
     try {
       const res = await getEarnings(workerId);
       const allEarnings = Array.isArray(res.data.data) ? res.data.data : [];
-      setEarnings(allEarnings.filter(e => e.verificationStatus !== 'verified'));
+      // Only show records that HAVEN'T been reviewed yet (unverified or pending)
+      setEarnings(allEarnings.filter(e => e.verificationStatus === 'unverified' || e.verificationStatus === 'pending'));
     } catch (err) {
       console.error(err);
     }

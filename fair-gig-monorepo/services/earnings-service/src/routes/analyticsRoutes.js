@@ -6,5 +6,6 @@ router.get('/worker/:workerId', analyticsController.getWorkerAnalytics);
 router.get('/aggregates', analyticsController.getAggregates);
 router.get('/median', analyticsController.getMedian);
 router.get('/community-insights', analyticsController.getCommunityInsights);
+router.get('/verifier/overview', analyticsController.getVerifierAnalytics);
 
 module.exports = router;

@@ -37,8 +37,8 @@ const earningSchema = new mongoose.Schema({
   }],
   verificationStatus: {
     type: String,
-    enum: ['unverified', 'pending', 'verified', 'flagged'],
-    default: 'unverified'
+    enum: ['unverified', 'pending', 'verified', 'flagged', 'unverifiable'],
+    default: 'pending'
   },
   anomalyScore: {
     type: Number,

@@ -1,12 +1,12 @@
-import { 
-  LayoutDashboard, 
-  IndianRupee, 
-  UploadCloud, 
-  BarChart3, 
-  FileText, 
-  MessageSquareWarning, 
-  Users, 
-  Bell, 
+import {
+  LayoutDashboard,
+  IndianRupee,
+  UploadCloud,
+  BarChart3,
+  FileText,
+  MessageSquareWarning,
+  Users,
+  Bell,
   Settings,
   ShieldCheck
 } from 'lucide-react';
@@ -33,8 +33,6 @@ export const navigationConfig = {
     {
       title: 'Support',
       links: [
-        { label: 'Grievances', path: '/dashboard/worker/grievances', icon: MessageSquareWarning },
-        { label: 'Notifications', path: '/dashboard/worker/notifications', icon: Bell },
         { label: 'Profile', path: '/dashboard/worker/profile', icon: Settings },
       ]
     }
@@ -58,7 +56,6 @@ export const navigationConfig = {
     {
       title: 'System',
       links: [
-        { label: 'Notifications', path: '/dashboard/verifier/notifications', icon: Bell },
         { label: 'Profile Settings', path: '/dashboard/verifier/profile', icon: Settings },
       ]
     }
