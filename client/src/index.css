@@ -1,9 +1,15 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #4F46E5;
+  --color-secondary: #10B981;
+  --color-accent: #F59E0B;
+  --color-background: #F9FAFB;
+  --font-sans: "Inter", "sans-serif";
+}
 
 @layer base {
   body {
-    @apply bg-background text-gray-900;
+    @apply bg-background text-slate-900 font-sans;
   }
 }

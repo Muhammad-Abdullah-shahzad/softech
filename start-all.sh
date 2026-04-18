@@ -6,21 +6,37 @@ export PATH=/usr/local/bin:/Users/mac/Library/Python/3.9/bin:$PATH
 
 echo "🚀 Starting FairGig Microservices..."
 
+# Function to clear ports
+clear_ports() {
+    echo "🧹 Cleaning up ports..."
+    local ports=(8000 5000 5002 5003 5004 5005 5173)
+    for port in "${ports[@]}"; do
+        pid=$(lsof -ti :$port)
+        if [ ! -z "$pid" ]; then
+            echo "Killing process on port $port"
+            kill -9 $pid 2>/dev/null
+        fi
+    done
+}
+
+# Run cleanup
+clear_ports
+
 # Function to start a service
 start_node_service() {
     local dir=$1
     local port=$2
     local name=$3
-    echo "Starting $name on port $port..."
-    cd "$ROOT_DIR/$dir" && npm run dev &
+    echo -e "🟢 \033[1;32mStarting $name\033[0m on port $port..."
+    cd "$ROOT_DIR/$dir" && (npm run dev > /dev/null 2>&1 &)
 }
 
 start_python_service() {
     local dir=$1
     local port=$2
     local name=$3
-    echo "Starting $name on port $port..."
-    cd "$ROOT_DIR/$dir" && python3 -m uvicorn app.main:app --port $port &
+    echo -e "🟢 \033[1;32mStarting $name\033[0m on port $port..."
+    cd "$ROOT_DIR/$dir" && (python3 -m uvicorn app.main:app --port $port > /dev/null 2>&1 &)
 }
 
 # Start all services

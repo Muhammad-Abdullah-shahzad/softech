@@ -9,10 +9,37 @@ const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '', role: 'worker' });
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.role === 'worker') navigate('/dashboard/worker');
-    // Simplified for minimal aesthetic
+    try {
+      const response = await fetch(`${import.meta.env.VITE_AUTH_URL}/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Save user info to localStorage if needed (cookies handle the session)
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Redirect based on role
+        if (data.user.role === 'worker') navigate('/dashboard/worker');
+        else if (data.user.role === 'advocate') navigate('/dashboard/advocate');
+        else navigate('/dashboard/verifier');
+      } else {
+        alert(data.message || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('An error occurred. Please try again.');
+    }
   };
 
   return (

@@ -15,9 +15,29 @@ const Signup = () => {
   });
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate('/login');
+    try {
+      const response = await fetch(`${import.meta.env.VITE_AUTH_URL}/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Signup successful! Please login.');
+        navigate('/login');
+      } else {
+        alert(data.message || 'Signup failed');
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      alert('An error occurred. Please try again.');
+    }
   };
 
   const labelClass = "block text-sm font-medium text-gray-700 mb-1";

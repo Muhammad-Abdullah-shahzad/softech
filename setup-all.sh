@@ -16,9 +16,15 @@ services=(
     "client"
 )
 
+export PATH=/usr/local/bin:/Users/mac/Library/Python/3.9/bin:$PATH
+
 for service in "${services[@]}"; do
     echo "Installing dependencies for $service..."
     cd "$ROOT_DIR/$service" && npm install
+    if [ "$service" == "client" ]; then
+        echo "Ensuring Tailwind dependencies are present for client..."
+        npm install -D tailwindcss @tailwindcss/postcss postcss autoprefixer
+    fi
 done
 
 # Python service
