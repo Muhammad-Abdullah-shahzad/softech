@@ -6,5 +6,5 @@ httpx==0.23.3
 pandas==2.2.2
 numpy==1.26.4
 scikit-learn==1.2.2
-motor==3.1.1
-dnspython==2.3.0
+motor==3.3.2
+dnspython==4.6.3
