@@ -17,12 +17,13 @@ import { uploadToCloudinary } from '../utils/cloudinary';
 
 const AddEarningForm = ({ onEarningAdded }) => {
   const [formData, setFormData] = useState({
-    workerId: 'worker_01', 
+    workerId: JSON.parse(localStorage.getItem('user') || '{}').id || JSON.parse(localStorage.getItem('user') || '{}').email || 'worker_01', 
     platform: 'Uber',
     grossAmount: '',
     shiftStart: null,
     shiftEnd: null,
-    evidenceUrls: []
+    evidenceUrls: [],
+    city: JSON.parse(localStorage.getItem('user') || '{}').city || 'Lahore'
   });
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);

@@ -6,7 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
  * Inspired by Mantine UI: Clean, high whitespace, no-nonsense typography.
  */
 const Login = () => {
-  const [formData, setFormData] = useState({ email: '', password: '', role: 'worker' });
+  const [formData, setFormData] = useState({ email: '', password: '' });
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -85,20 +85,7 @@ const Login = () => {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Login as
-              </label>
-              <select
-                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                value={formData.role}
-                onChange={(e) => setFormData({...formData, role: e.target.value})}
-              >
-                <option value="worker">Worker</option>
-                <option value="advocate">Advocate</option>
-                <option value="verifier">Verifier</option>
-              </select>
-            </div>
+
 
 
             <div>

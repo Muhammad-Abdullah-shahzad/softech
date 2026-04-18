@@ -44,9 +44,22 @@ const earningSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  anomalies: [{
+    type: { type: String },
+    severity: String,
+    message: String,
+    details: String,
+    affectedDates: [String],
+    suggestion: String
+  }],
   metadata: {
     type: Map,
     of: String
+  },
+  city: {
+    type: String,
+    required: true,
+    default: 'Lahore'
   }
 }, {
   timestamps: true

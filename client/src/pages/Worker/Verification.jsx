@@ -16,7 +16,8 @@ const Verification = () => {
   const [earnings, setEarnings] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [uploadingId, setUploadingId] = useState(null);
-  const workerId = 'worker_01';
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const workerId = user.id || user.email || 'worker_01';
 
   useEffect(() => {
     fetchEarnings();
@@ -135,8 +136,10 @@ const Verification = () => {
                     <div className="flex gap-3">
                         <FileWarning size={18} className="text-rose-600 shrink-0" />
                         <div>
-                            <p className="text-sm font-bold text-rose-900">Verifier Comment:</p>
-                            <p className="text-sm text-rose-700 italic">{item.verifierComments || "Screenshot is blurry or doesn't match data."}</p>
+                            <p className="text-sm font-bold text-rose-900">Flag Reason:</p>
+                            <p className="text-sm text-rose-700 italic">
+                                {item.verifierComments || (item.anomalies && item.anomalies.length > 0 ? item.anomalies[0].message : "Record flagged for manual review.")}
+                            </p>
                         </div>
                     </div>
                 </div>

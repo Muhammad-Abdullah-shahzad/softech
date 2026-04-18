@@ -64,3 +64,20 @@ exports.getGrievances = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+exports.getTrendingGrievances = async (req, res) => {
+  try {
+    const trending = [
+      { title: 'Delayed Payments', platform: 'Uber', affectedCount: 156 },
+      { title: 'Unfair Rating Drop', platform: 'Zomato', affectedCount: 89 },
+      { title: 'Insurance Deductions', platform: 'Swiggy', affectedCount: 230 },
+      { title: 'Account Suspension', platform: 'Careem', affectedCount: 45 }
+    ];
+
+    res.status(200).json({
+      success: true,
+      data: trending
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

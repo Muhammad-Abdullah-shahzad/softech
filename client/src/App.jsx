@@ -14,6 +14,7 @@ import Grievances from './pages/Worker/Grievances';
 import Community from './pages/Worker/Community';
 import Notifications from './pages/Worker/Notifications';
 import Profile from './pages/Worker/Profile';
+import Anomalies from './pages/Worker/Anomalies';
 
 import AdminDashboard from './pages/AdminDashboard';
 import AnalystDashboard from './pages/AnalystDashboard';
@@ -42,7 +43,7 @@ function App() {
           <Route path="overview" element={<DashboardOverview />} />
           <Route path="earnings" element={<Earnings />} />
           <Route path="upload" element={<Verification />} />
-          <Route path="anomalies" element={<Notifications />} /> {/* Reusing Notifications for anomaly focus */}
+          <Route path="anomalies" element={<Anomalies />} /> 
           <Route path="analytics" element={<Analytics />} />
           <Route path="certificate" element={<IncomeCertificate />} />
           <Route path="grievances" element={<Grievances />} />
@@ -59,6 +60,9 @@ function App() {
 
         {/* Support Dashboard */}
         <Route path="/dashboard/support" element={<SupportDashboard />} />
+
+        {/* Advocate Dashboard */}
+        <Route path="/dashboard/advocate" element={<AnalystDashboard />} />
         
         {/* Verifier Dashboard with Nested Routes */}
         <Route path="/dashboard/verifier" element={<VerifierDashboard />}>

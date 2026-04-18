@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { getCommunityInsights } from '../../api/analytics';
 import { getTrendingGrievances } from '../../api/grievance';
-import { Badge, Progress, Avatar, Group, Text, Paper } from '@mantine/core';
+import { Badge, Progress, Avatar, Group, Text, Paper, Button } from '@mantine/core';
 
 const Community = () => {
   const [insights, setInsights] = useState(null);

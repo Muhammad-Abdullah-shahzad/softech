@@ -11,7 +11,8 @@ const Signup = () => {
     email: '', 
     cnic: '',
     password: '', 
-    role: 'worker' 
+    role: 'worker',
+    city: 'Lahore'
   });
   const navigate = useNavigate();
 
@@ -67,6 +68,25 @@ const Signup = () => {
                 <option value="worker">Worker</option>
                 <option value="advocate">Advocate</option>
                 <option value="verifier">Verifier</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className={labelClass}>City (Pakistan)</label>
+              <select
+                className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                value={formData.city}
+                onChange={(e) => setFormData({...formData, city: e.target.value})}
+              >
+                <option value="Lahore">Lahore</option>
+                <option value="Karachi">Karachi</option>
+                <option value="Islamabad">Islamabad</option>
+                <option value="Rawalpindi">Rawalpindi</option>
+                <option value="Faisalabad">Faisalabad</option>
+                <option value="Multan">Multan</option>
+                <option value="Peshawar">Peshawar</option>
+                <option value="Quetta">Quetta</option>
+                <option value="Sialkot">Sialkot</option>
               </select>
             </div>
 

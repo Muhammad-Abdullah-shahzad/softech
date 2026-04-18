@@ -5,11 +5,11 @@ import {
   IndianRupee, 
   Clock, 
   ArrowUpRight, 
-  AlertCircle 
+  AlertCircle,
+  ChevronRight
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { 
-  LineChart, 
-  Line, 
   AreaChart, 
   Area, 
   BarChart, 
@@ -21,8 +21,7 @@ import {
   ResponsiveContainer, 
   Cell
 } from 'recharts';
-import { getWorkerStats, getTrends, getCityMedian } from '../../api/analytics';
-import { getAnomalyAlerts } from '../../api/anomaly';
+import { getWorkerAnalytics, getMedianAnalytics } from '../../api/earnings';
 
 const StatCard = ({ title, value, subtext, icon: Icon, color, trend }) => (
   <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
@@ -49,23 +48,23 @@ const DashboardOverview = () => {
   const [cityMedian, setCityMedian] = useState(null);
   const [anomalies, setAnomalies] = useState([]);
   const [loading, setLoading] = useState(true);
-  const workerId = 'worker_01'; // In real app, get from auth context
+  const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const workerId = user.id || user.email || 'worker_01';
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [statsRes, trendsRes, anomaliesRes] = await Promise.all([
-          getWorkerStats(workerId),
-          getTrends(workerId),
-          getAnomalyAlerts(workerId)
+        const [analyticsRes, medianRes] = await Promise.all([
+          getWorkerAnalytics(workerId),
+          getMedianAnalytics(user.city)
         ]);
         
-        setStats(statsRes.data.data);
-        setTrends(trendsRes.data.data);
-        setAnomalies(anomaliesRes.data); // Python service returns list directly
-        
-        const medianRes = await getCityMedian(statsRes.data.data?.city || 'Mumbai');
-        setCityMedian(medianRes.data.data);
+        const data = analyticsRes.data.data;
+        setStats({ ...data.stats, platformBreakdown: data.platformComparison });
+        setTrends(data.earningsTrend);
+        setAnomalies(data.anomalies);
+        setCityMedian(medianRes.data.data.cityMedian);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
       } finally {
@@ -114,7 +113,7 @@ const DashboardOverview = () => {
         <StatCard 
           title="Avg. Hourly Rate" 
           value={`₹${stats?.hourlyRate || 0}/hr`} 
-          subtext={`City Avg: ₹${cityMedian?.medianRate || 0}/hr`}
+          subtext={`City Avg: ₹${cityMedian || 150}/hr`}
           icon={Clock}
           color="bg-blue-600"
           trend={stats?.rateTrend}
@@ -124,7 +123,7 @@ const DashboardOverview = () => {
           value={anomalies?.length || 0} 
           subtext={anomalies?.length > 0 ? "Requires your attention" : "All records look good"}
           icon={AlertCircle}
-          color={anomalies?.length > 0 ? "bg-rose-500" : "bg-emerald-500"}
+          color={anomalies?.length > 0 ? "bg-red-500" : "bg-teal-500"}
         />
       </div>
 
@@ -133,12 +132,8 @@ const DashboardOverview = () => {
         <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
           <div className="flex justify-between items-center mb-8">
             <h3 className="text-xl font-bold text-slate-900">Earnings Trend</h3>
-            <select className="bg-slate-50 border-none rounded-lg text-sm font-medium px-4 py-2 ring-1 ring-slate-200">
-              <option>Last 30 Days</option>
-              <option>Last 6 Months</option>
-            </select>
           </div>
-          <div className="h-80 min-w-0">
+          <div className="h-80 min-h-[320px] min-w-0">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={trends}>
                 <defs>
@@ -163,7 +158,7 @@ const DashboardOverview = () => {
         {/* Platform Breakdown */}
         <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
           <h3 className="text-xl font-bold text-slate-900 mb-8">Platform Split</h3>
-          <div className="h-80 min-w-0">
+          <div className="h-80 min-h-[320px] min-w-0">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats?.platformBreakdown || []}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -173,7 +168,7 @@ const DashboardOverview = () => {
                   cursor={{fill: '#f8fafc'}}
                   contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'}}
                 />
-                <Bar dataKey="earnings" radius={[8, 8, 0, 0]}>
+                <Bar dataKey="amount" radius={[8, 8, 0, 0]}>
                   {stats?.platformBreakdown?.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={['#6366f1', '#a855f7', '#3b82f6', '#10b981'][index % 4]} />
                   ))}
@@ -185,7 +180,7 @@ const DashboardOverview = () => {
             {stats?.platformBreakdown?.map((item, idx) => (
               <div key={idx} className="flex justify-between items-center text-sm">
                 <span className="text-slate-500">{item.platform}</span>
-                <span className="font-bold text-slate-900">₹{item.earnings}</span>
+                <span className="font-bold text-slate-900">₹{item.amount}</span>
               </div>
             ))}
           </div>
@@ -194,17 +189,23 @@ const DashboardOverview = () => {
 
       {/* Anomalies Highlight */}
       {anomalies.length > 0 && (
-        <div className="bg-rose-50 border border-rose-100 rounded-3xl p-6 flex gap-6 items-center">
-          <div className="bg-rose-500 p-3 rounded-2xl shrink-0">
-            <AlertCircle className="text-white" size={24} />
-          </div>
-          <div className="flex-1">
-            <h4 className="text-rose-900 font-bold text-lg border-rose-200">Check Your Recent Shifts</h4>
-            <p className="text-rose-700">We detected {anomalies.length} entries that differ significantly from your usual patterns.</p>
-          </div>
-          <button className="bg-rose-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-rose-700 transition-colors shadow-lg shadow-rose-200">
-            Review Now
-          </button>
+        <div className="bg-rose-50 border border-rose-100 rounded-3xl p-8 flex flex-col md:flex-row items-center gap-6 justify-between shadow-sm">
+           <div className="flex gap-6 items-center">
+             <div className="bg-rose-500 p-4 rounded-2xl shrink-0 text-white shadow-lg shadow-rose-200">
+               <AlertCircle size={32} />
+             </div>
+             <div>
+               <h4 className="text-rose-900 font-bold text-xl border-none">Integrity Alerts Detected</h4>
+               <p className="text-rose-700">The AI Engine found {anomalies.length} unusual pattern(s). Please review them in the anomaly center.</p>
+             </div>
+           </div>
+           
+           <button 
+             onClick={() => navigate('/dashboard/worker/anomalies')}
+             className="bg-rose-600 hover:bg-rose-700 text-white px-8 py-4 rounded-2xl font-bold flex items-center gap-2 transition-all shadow-md active:scale-95"
+           >
+             View Anomalies <ChevronRight size={18} />
+           </button>
         </div>
       )}
     </div>

@@ -1,25 +1,23 @@
 from pydantic import BaseModel
-from typing import List, Optional
-from datetime import datetime
+from typing import List
 
-class EarningData(BaseModel):
-    earning_id: str
-    worker_id: str
-    gross_amount: float
-    platform: str
-    duration_hours: float
+class EarningRecord(BaseModel):
+    date: str
+    hoursWorked: float
+    grossAmount: float
+    deductions: float
+    netAmount: float
 
 class AnomalyRequest(BaseModel):
-    earning_id: str
-    worker_id: str
-    gross_amount: float
-    platform: str
-    duration_hours: float
-    history: Optional[List[dict]] = []
+    workerId: str
+    earnings: List[EarningRecord]
+
+class AnomalyDetail(BaseModel):
+    type: str
+    severity: str
+    message: str
+    affectedDates: List[str]
+    suggestion: str
 
 class AnomalyResponse(BaseModel):
-    earning_id: str
-    is_anomaly: bool
-    score: float
-    explanation: str
-    detected_at: datetime = datetime.now()
+    anomalies: List[AnomalyDetail]

@@ -1,6 +1,7 @@
 import api from './axiosConfig';
 
 const EARNINGS_URL = import.meta.env.VITE_EARNINGS_URL || 'http://localhost:5002/api/earnings';
+const ANALYTICS_URL = import.meta.env.VITE_ANALYTICS_URL || 'http://localhost:5002/api/analytics';
 
 export const getEarnings = (workerId, status, platform) => {
     let url = `${EARNINGS_URL}?`;
@@ -17,3 +18,7 @@ export const deleteEarning = (id) => api.delete(`${EARNINGS_URL}/${id}`);
 export const uploadVerification = (id, formData) => api.post(`${EARNINGS_URL}/${id}/upload`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
 });
+
+export const getWorkerAnalytics = (workerId) => api.get(`${ANALYTICS_URL}/worker/${workerId}`);
+export const getMedianAnalytics = (city) => api.get(`${ANALYTICS_URL}/median${city ? `?city=${city}` : ''}`);
+export const getAggregateAnalytics = () => api.get(`${ANALYTICS_URL}/aggregates`);

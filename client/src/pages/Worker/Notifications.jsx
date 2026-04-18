@@ -14,7 +14,8 @@ import { Badge, ActionIcon, Group, Text, Divider } from '@mantine/core';
 const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const workerId = 'worker_01';
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const workerId = user.id || user.email || 'worker_01';
 
   useEffect(() => {
     const fetchNotifications = async () => {

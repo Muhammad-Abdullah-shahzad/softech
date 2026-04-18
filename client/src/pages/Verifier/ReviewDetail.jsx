@@ -193,6 +193,29 @@ const ReviewDetail = () => {
 
         {/* RIGHT: Data Comparison */}
         <Stack spacing="lg">
+           {/* Anomaly Alerts Section */}
+           {earning.anomalies && earning.anomalies.length > 0 && (
+             <Card radius="24px" withBorder p="xl" className="border-rose-100 bg-rose-50/30 shadow-sm">
+                <Group mb="md">
+                  <div className="bg-rose-500 p-2 rounded-xl text-white">
+                    <AlertTriangle size={20} />
+                  </div>
+                  <Text fw={800} c="rose.9">System Integrity Flag</Text>
+                </Group>
+                <Stack gap="sm">
+                  {earning.anomalies.map((anomaly, idx) => (
+                    <div key={idx} className="bg-white p-4 rounded-2xl border border-rose-100 shadow-sm">
+                       <Text size="xs" fw={800} tt="uppercase" c="rose.6" mb={2}>
+                         {anomaly.type.replace(/_/g, ' ')} ({anomaly.severity})
+                       </Text>
+                       <Text size="sm" fw={600} c="slate.8">{anomaly.message}</Text>
+                       <Text size="xs" c="dimmed" mt={4} italic>{anomaly.suggestion}</Text>
+                    </div>
+                  ))}
+                </Stack>
+             </Card>
+           )}
+
            <Card radius="24px" withBorder p="xl" className="shadow-sm">
                <Group justify="space-between" mb={30}>
                   <Group>

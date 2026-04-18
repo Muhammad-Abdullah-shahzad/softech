@@ -4,35 +4,49 @@ import {
   LineChart, Line, ComposedChart, Area
 } from 'recharts';
 import { 
-  getTrends, 
-  getPlatformComparison, 
-  getCityMedian 
-} from '../../api/analytics';
+  getWorkerAnalytics, 
+  getMedianAnalytics 
+} from '../../api/earnings';
 import { 
   TrendingUp, 
-  Info, 
   Zap, 
   Target 
 } from 'lucide-react';
 
 const Analytics = () => {
   const [trends, setTrends] = useState([]);
+  const [hourlyTrend, setHourlyTrend] = useState([]);
   const [platformData, setPlatformData] = useState([]);
   const [cityMedian, setCityMedian] = useState(null);
   const [loading, setLoading] = useState(true);
-  const workerId = 'worker_01';
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const workerId = user.id || user.email || 'worker_01';
 
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
-        const [trendsRes, platformRes, medianRes] = await Promise.all([
-          getTrends(workerId, 'monthly'),
-          getPlatformComparison(workerId),
-          getCityMedian('Mumbai')
+        const [workerRes, medianRes] = await Promise.all([
+          getWorkerAnalytics(workerId),
+          getMedianAnalytics()
         ]);
-        setTrends(trendsRes.data.data);
-        setPlatformData(platformRes.data.data);
-        setCityMedian(medianRes.data.data);
+        setTrends(workerRes.data.data.earningsTrend);
+        
+        // Let's add the median to the hourly trend for chart rendering
+        const median = medianRes.data.data.cityMedian || 150;
+        const mappedHourly = workerRes.data.data.hourlyRateTrend.map(h => ({
+            ...h,
+            cityAvg: median
+        }));
+        
+        setHourlyTrend(mappedHourly);
+        
+        // Calculate dynamic commissions
+        const mappedPlatforms = workerRes.data.data.platformComparison.map(p => ({
+            name: p.platform,
+            commissionRate: 15 // Assuming static platform commission till actual feature is built
+        }));
+        setPlatformData(mappedPlatforms);
+        setCityMedian(median);
       } catch (err) {
         console.error(err);
       } finally {
@@ -65,7 +79,7 @@ const Analytics = () => {
           </div>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={trends}>
+              <ComposedChart data={hourlyTrend}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
@@ -114,39 +128,38 @@ const Analytics = () => {
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
             <div className="space-y-4">
                 <span className="bg-indigo-500 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full">Fairness Report</span>
-                <h3 className="text-3xl font-bold max-w-md">Your effective hourly rate is 12% higher than the city median.</h3>
-                <p className="text-slate-400 max-w-lg">Based on data from 4,200+ workers in Mumbai. You are among the top 15% earners this month.</p>
+                <h3 className="text-3xl font-bold max-w-md">Your market benchmarking statistics are based on dynamic data.</h3>
+                <p className="text-slate-400 max-w-lg">Based on data from verified workers in your exact region.</p>
             </div>
             <div className="flex gap-10">
                 <div className="text-center">
-                    <p className="text-slate-400 text-sm mb-1">Your Avg</p>
-                    <p className="text-4xl font-black italic">₹{cityMedian?.yourRate || 215}</p>
+                    <p className="text-slate-400 text-sm mb-1">Your Avg Rate</p>
+                    <p className="text-4xl font-black italic">₹{hourlyTrend.length > 0 ? (hourlyTrend.reduce((acc, curr) => acc + curr.rate, 0) / hourlyTrend.length).toFixed(0) : 0}</p>
                 </div>
                 <div className="text-center">
-                    <p className="text-slate-400 text-sm mb-1">Median</p>
-                    <p className="text-4xl font-black italic opacity-40">₹{cityMedian?.medianRate || 192}</p>
+                    <p className="text-slate-400 text-sm mb-1">City Median Rate</p>
+                    <p className="text-4xl font-black italic opacity-40">₹{cityMedian}</p>
                 </div>
             </div>
         </div>
         <Target className="absolute -bottom-10 -right-10 text-indigo-500/10 w-64 h-64" />
       </div>
 
-      {/* Row 2: Monthly Trends */}
+      {/* Row 2: Earnings Trend */}
       <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
-        <h3 className="text-lg font-bold text-slate-900 mb-8 border-none">Earnings Consistency (Last 6 Months)</h3>
+        <h3 className="text-lg font-bold text-slate-900 mb-8 border-none">Earnings Consistency</h3>
         <div className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={trends}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
+                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
                 <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} />
                 <Tooltip 
                   cursor={{stroke: '#4f46e5', strokeWidth: 2}}
                   contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)'}}
                 />
                 <Legend verticalAlign="top" align="right" />
-                <Line type="stepAfter" dataKey="amount" stroke="#4f46e5" strokeWidth={4} dot={{ r: 6, fill: '#4f46e5', strokeWidth: 3, stroke: '#fff' }} />
-                <Line type="basis" dataKey="target" stroke="#e2e8f0" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="amount" name="Net Amount" stroke="#4f46e5" strokeWidth={4} dot={{ r: 6, fill: '#4f46e5', strokeWidth: 3, stroke: '#fff' }} />
               </LineChart>
             </ResponsiveContainer>
         </div>

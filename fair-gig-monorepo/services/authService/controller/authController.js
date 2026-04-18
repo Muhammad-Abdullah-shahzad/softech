@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 // POST /api/auth/signup
 export const signup = async (req, res) => {
   try {
-    const { fullName, email, cnic, password, role } = req.body;
+    const { fullName, email, cnic, password, role, city } = req.body;
 
     // 1. Check if user already exists
     const existingUser = await User.findOne({ 
@@ -28,7 +28,8 @@ export const signup = async (req, res) => {
       email,
       cnic,
       password: hashedPassword,
-      role
+      role,
+      city
     });
 
     // 4. Generate JWT token

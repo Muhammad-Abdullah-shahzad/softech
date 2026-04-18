@@ -30,12 +30,18 @@ exports.createEarning = async (req, res) => {
 
 exports.getEarningsHistory = async (req, res) => {
   try {
-    const { workerId, status, platform, sortBy, order } = req.query;
+    const { workerId, status, platform, sortBy, order, startDate, endDate } = req.query;
     
     let query = {};
     if (workerId) query.workerId = workerId;
     if (status) query.verificationStatus = status;
     if (platform) query.platform = platform;
+    
+    if (startDate || endDate) {
+      query.shiftStart = {};
+      if (startDate) query.shiftStart.$gte = new Date(startDate);
+      if (endDate) query.shiftStart.$lte = new Date(endDate);
+    }
 
     let sort = { createdAt: -1 }; // Default: newest first
     if (sortBy) {
@@ -99,6 +105,9 @@ exports.updateEarning = async (req, res) => {
     if (!earning) {
       return res.status(404).json({ success: false, message: 'Earning not found' });
     }
+
+    // Async trigger anomaly detection (don't block the response)
+    anomalyService.detectAnomaly(earning._id).catch(err => console.error('Anomaly check failed:', err));
 
     res.status(200).json({ success: true, data: earning });
   } catch (error) {

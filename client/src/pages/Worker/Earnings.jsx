@@ -21,7 +21,8 @@ const Earnings = () => {
   const [filterPlatform, setFilterPlatform] = useState('All');
   const [opened, { open, close }] = useDisclosure(false);
   const [editingItem, setEditingItem] = useState(null);
-  const workerId = 'worker_01';
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const workerId = user.id || user.email || 'worker_01';
 
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],

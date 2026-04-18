@@ -17,12 +17,8 @@ const WorkerDashboard = () => {
     // For demo purposes, if no user, we'll use a mock if we're on the dashboard
     // but in production we'd redirect to login
     if (!token && !storedUser) {
-        // Mocking for the completion of the task if user hasn't logged in yet
-        const mockUser = { name: "Muhammad Abdullah", role: "worker", email: "abdullah@fairgig.io" };
-        localStorage.setItem('user', JSON.stringify(mockUser));
-        localStorage.setItem('token', 'mock-jwt-token');
-        setUser(mockUser);
-    } else {
+        navigate('/login');
+    } else if (storedUser) {
         setUser(JSON.parse(storedUser));
     }
   }, [navigate]);

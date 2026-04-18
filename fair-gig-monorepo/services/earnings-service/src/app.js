@@ -4,6 +4,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const connectDB = require('./config/db');
 const earningsRoutes = require('./routes/earningsRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(morgan('dev'));
 
 // Routes
 app.use('/api/earnings', earningsRoutes);
+app.use('/api/analytics', analyticsRoutes);
 
 // Health Check
 app.use('/health', (req, res) => {

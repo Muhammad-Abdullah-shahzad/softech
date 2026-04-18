@@ -18,7 +18,8 @@ const Grievances = () => {
   const [loading, setLoading] = useState(true);
   const [opened, { open, close }] = useDisclosure(false);
   const [selectedGrievance, setSelectedGrievance] = useState(null);
-  const workerId = 'worker_01';
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const workerId = user.id || user.email || 'worker_01';
 
   const [formData, setFormData] = useState({
     title: '',

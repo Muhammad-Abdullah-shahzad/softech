@@ -23,6 +23,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['worker', 'advocate', 'verifier'],
     default: 'worker'
+  },
+  city: {
+    type: String,
+    required: true,
+    default: 'Lahore'
   }
 }, { timestamps: true });
 
