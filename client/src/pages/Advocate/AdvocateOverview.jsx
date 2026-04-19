@@ -142,11 +142,15 @@ const AdvocateOverview = () => {
         <div className="bg-slate-900 p-6 rounded-3xl border-none shadow-xl hover:shadow-2xl transition-all relative overflow-hidden group min-h-[160px] flex flex-col justify-between text-white">
           <ShieldCheck size={120} strokeWidth={1} className="absolute -top-2 -right-4 text-white opacity-[0.12] group-hover:scale-110 group-hover:opacity-[0.18] transition-all duration-700 pointer-events-none" />
           <div className="relative z-10">
-              <p className="text-indigo-200 text-[10px] font-bold uppercase tracking-widest mb-1">System Community</p>
-              <h3 className="text-4xl font-bold text-[#28e0b6] tracking-tight">{data.kpis.totalGrievances || 0}</h3>
+              <p className="text-indigo-200 text-[10px] font-bold uppercase tracking-widest mb-1">System Fairness Index</p>
+              <h3 className="text-4xl font-bold text-[#28e0b6] tracking-tight">
+                {data.platformFairness && data.platformFairness.length > 0 
+                  ? Math.round(data.platformFairness.reduce((acc, curr) => acc + curr.score, 0) / data.platformFairness.length) 
+                  : '85'}%
+              </h3>
           </div>
           <div className="relative z-10 flex justify-between items-end mt-4">
-              <p className="text-indigo-300 opacity-60 text-[11px] font-medium italic">Total workers discussing issues</p>
+              <p className="text-indigo-300 opacity-60 text-[11px] font-medium italic">Avg score across all platforms</p>
           </div>
         </div>
       </div>

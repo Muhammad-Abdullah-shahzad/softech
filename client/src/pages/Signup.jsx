@@ -14,8 +14,80 @@ const Signup = () => {
   });
   const navigate = useNavigate();
 
+  const handleCnicChange = (e) => {
+    let value = e.target.value.replace(/\D/g, ''); // Remove all non-digits
+    if (value.length > 13) value = value.slice(0, 13);
+    
+    // Add dashes automatically
+    let formatted = value;
+    if (value.length > 5 && value.length <= 12) {
+      formatted = `${value.slice(0, 5)}-${value.slice(5)}`;
+    } else if (value.length > 12) {
+      formatted = `${value.slice(0, 5)}-${value.slice(5, 12)}-${value.slice(12)}`;
+    }
+    
+    setFormData({ ...formData, cnic: formatted });
+  };
+
+  const validateForm = () => {
+    // Email validation
+    const emailRegex = /^[a-zA-Z0-0._%+-]+@gmail\.com$/; // Specific check for @gmail.com as requested
+    const generalEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!generalEmailRegex.test(formData.email)) {
+      notifications.show({
+        title: 'Invalid Email',
+        message: 'Please enter a valid digital mail address.',
+        color: 'red',
+        icon: <X size={16} />,
+        radius: 'md'
+      });
+      return false;
+    }
+
+    if (!formData.email.endsWith('@gmail.com')) {
+        notifications.show({
+          title: 'Email Provider Restricted',
+          message: 'Currently, only @gmail.com addresses are supported for verification.',
+          color: 'orange',
+          icon: <X size={16} />,
+          radius: 'md'
+        });
+        return false;
+      }
+
+    // CNIC validation
+    const cnicRegex = /^\d{5}-\d{7}-\d{1}$/;
+    if (!cnicRegex.test(formData.cnic)) {
+      notifications.show({
+        title: 'Invalid CNIC',
+        message: 'CNIC must be in 00000-0000000-0 format.',
+        color: 'red',
+        icon: <X size={16} />,
+        radius: 'md'
+      });
+      return false;
+    }
+
+    // Password validation (simple)
+    if (formData.password.length < 6) {
+      notifications.show({
+        title: 'Weak Identity Lock',
+        message: 'Password must be at least 6 characters long.',
+        color: 'red',
+        icon: <X size={16} />,
+        radius: 'md'
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     try {
       const response = await fetch(`${import.meta.env.VITE_AUTH_URL}/signup`, {
         method: 'POST',
@@ -141,12 +213,12 @@ const Signup = () => {
             <div>
               <label className={labelClass}>Government CNIC</label>
               <input type="text" required placeholder="00000-0000000-0" className={inputClass}
-                value={formData.cnic} onChange={(e) => setFormData({...formData, cnic: e.target.value})} />
+                value={formData.cnic} onChange={handleCnicChange} />
             </div>
 
             <div>
               <label className={labelClass}>Digital Mail</label>
-              <input type="email" required placeholder="name@fairgig.io" className={inputClass}
+              <input type="email" required placeholder="name@gmail.com" className={inputClass}
                 value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} />
             </div>
 

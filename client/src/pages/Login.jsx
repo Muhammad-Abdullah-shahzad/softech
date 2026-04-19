@@ -11,8 +11,38 @@ const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const navigate = useNavigate();
 
+  const validateForm = () => {
+    const generalEmailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!generalEmailRegex.test(formData.email)) {
+      notifications.show({
+        title: 'Invalid Email',
+        message: 'Please enter a valid digital mail address.',
+        color: 'red',
+        icon: <X size={16} />,
+        radius: 'md'
+      });
+      return false;
+    }
+
+    if (!formData.email.endsWith('@gmail.com')) {
+      notifications.show({
+        title: 'Email Provider Restricted',
+        message: 'Currently, only @gmail.com addresses are authorized.',
+        color: 'orange',
+        icon: <X size={16} />,
+        radius: 'md'
+      });
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+    
     try {
       const response = await fetch(`${import.meta.env.VITE_AUTH_URL}/login`, {
         method: 'POST',
@@ -113,7 +143,7 @@ const Login = () => {
               <input
                 type="email"
                 required
-                placeholder="name@fairgig.io"
+                placeholder="name@gmail.com"
                 className="block w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-slate-300 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#28e0b6] focus:border-transparent transition-all"
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}

@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json());
 // CORS must be configured to allow credentials (cookies) to be sent from the client
 app.use(cors({
-  origin: 'http://localhost:5173', // Update this to match your frontend URL
+  origin: '*', // Update this to match your frontend URL
   credentials: true
 }));
 app.use(cookieParser());
