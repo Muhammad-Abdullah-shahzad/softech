@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { notifications } from '@mantine/notifications';
+import { Check, X } from 'lucide-react';
 
 const Signup = () => {
   const [formData, setFormData] = useState({ 
@@ -22,14 +24,32 @@ const Signup = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        alert('Signup successful! Please login.');
+        notifications.show({
+          title: 'Identity Created',
+          message: 'Signup successful! Please login.',
+          color: 'fairgig',
+          icon: <Check size={16} />,
+          radius: 'md'
+        });
         navigate('/login');
       } else {
-        alert(data.message || 'Signup failed');
+        notifications.show({
+          title: 'Signup Failed',
+          message: data.message || 'Verification rejected',
+          color: 'red',
+          icon: <X size={16} />,
+          radius: 'md'
+        });
       }
     } catch (error) {
       console.error('Signup error:', error);
-      alert('An error occurred. Please try again.');
+      notifications.show({
+        title: 'System Error',
+        message: 'Could not connect to registration node',
+        color: 'red',
+        icon: <X size={16} />,
+        radius: 'md'
+      });
     }
   };
 

@@ -25,6 +25,7 @@ import {
     Select,
     Divider
 } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { 
     MessageSquare, 
     AlertTriangle, 
@@ -36,7 +37,9 @@ import {
     MessageCircle,
     Users,
     ChevronDown,
-    Filter
+    Filter,
+    Check,
+    X
 } from 'lucide-react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -76,7 +79,13 @@ const AdvocateCommunity = () => {
             await updatePostStatus(id, update);
             fetchData();
         } catch (err) {
-            alert('Update failed');
+            notifications.show({
+                title: 'Action Failed',
+                message: 'Could not update grievance status',
+                color: 'red',
+                icon: <X size={16} />,
+                radius: 'md'
+            });
         }
     };
 
@@ -84,10 +93,22 @@ const AdvocateCommunity = () => {
         if (!broadcastMsg) return;
         try {
             await createBroadcast({ content: broadcastMsg, author: 'Labor Advocate' });
-            alert('Broadcast sent to all workers!');
+            notifications.show({
+                title: 'Broadcast Dispatched',
+                message: 'Announcement sent to all worker nodes',
+                color: 'fairgig',
+                icon: <Send size={16} />,
+                radius: 'md'
+            });
             setBroadcastMsg('');
         } catch (err) {
-            alert('Broadcast failed');
+            notifications.show({
+                title: 'Broadcast Failed',
+                message: 'System could not propagate the message',
+                color: 'red',
+                icon: <X size={16} />,
+                radius: 'md'
+            });
         }
     };
 
@@ -109,54 +130,65 @@ const AdvocateCommunity = () => {
         <div className="space-y-10 pb-20 max-w-7xl mx-auto">
             <LoadingOverlay visible={loading} />
             
-            <header>
-                <h1 className="text-4xl font-black text-slate-800 tracking-tighter uppercase italic border-none mb-2">Community Watch</h1>
-                <p className="text-slate-500 font-bold">Monitor systemic issues and broadcast vital information to workers.</p>
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+                <div>
+                    <h2 className="text-2xl font-bold text-slate-900 border-none tracking-tight">Community Watch</h2>
+                    <p className="text-slate-500 font-medium tracking-tight">Monitor systemic issues and broadcast vital information to workers.</p>
+                </div>
+                <Group>
+                    <Badge size="xl" color="rose" variant="light" radius="md" py={22} px={20} className="border border-rose-100">
+                        <Group gap="xs">
+                            <AlertTriangle size={16} />
+                            <Text fw={800} size="sm" tt="uppercase" tracking="0.05em">Real-time Signals</Text>
+                        </Group>
+                    </Badge>
+                </Group>
             </header>
 
             {/* PRIORITY CARDS */}
-            <SimpleGrid cols={{ base: 1, md: 3 }} spacing="xl">
-                <Card radius="32px" withBorder className="shadow-sm border-slate-100 p-8 border-l-rose-500 border-l-4">
-                    <Group justify="space-between" mb="xs">
-                        <ThemeIcon color="rose" variant="light" radius="md"><AlertTriangle size={20}/></ThemeIcon>
-                        <Badge color="rose" radius="sm">CRITICAL</Badge>
-                    </Group>
-                    <Text size="xs" fw={800} c="dimmed" tt="uppercase">Most Reported Issue</Text>
-                    <Text size="xl" fw={900} mt={5}>{stats?.mostReported?._id || 'N/A'}</Text>
-                    <Text size="xs" fw={700} c="rose.6" mt={5}>{stats?.mostReported?.count || 0} active reports</Text>
-                </Card>
-
-                <Card radius="32px" withBorder className="shadow-sm border-slate-100 p-8 border-l-indigo-500 border-l-4">
-                    <Group justify="space-between" mb="xs">
-                        <ThemeIcon color="indigo" variant="light" radius="md"><TrendingUp size={20}/></ThemeIcon>
-                        <Badge color="indigo" radius="sm">RISING</Badge>
-                    </Group>
-                    <Text size="xs" fw={800} c="dimmed" tt="uppercase">Trend Spotting</Text>
-                    <Text size="xl" fw={900} mt={5}>{stats?.risingIssue?._id || 'N/A'}</Text>
-                    <Text size="xs" fw={700} c="indigo.6" mt={5}>Platform with most growth</Text>
-                </Card>
-
-                <div className="bg-slate-900 rounded-[32px] p-8 text-white relative overflow-hidden group">
-                    <div className="relative z-10 h-full flex flex-col justify-between">
-                        <div>
-                            <Text size="xs" fw={800} c="slate.4" tt="uppercase">Active Reach</Text>
-                            <Text size="2xl" fw={900}>4.2k Workers</Text>
-                        </div>
-                        <Group gap="xs" mt={20}>
-                            <Users size={16} className="text-emerald-400" />
-                            <Text size="xs" fw={700} c="slate.3">Growing by 12% MoM</Text>
-                        </Group>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden group min-h-[160px] flex flex-col justify-between border-l-4 border-l-rose-500">
+                    <AlertTriangle size={120} strokeWidth={1} className="absolute -top-2 -right-4 text-slate-900 opacity-[0.12] group-hover:scale-110 group-hover:opacity-[0.18] transition-all duration-700 pointer-events-none" />
+                    <div className="relative z-10">
+                        <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Most Reported Issue</p>
+                        <h3 className="text-3xl font-bold text-slate-900 tracking-tight">{stats?.mostReported?._id || 'N/A'}</h3>
                     </div>
-                    <Box className="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-110 transition-transform">
-                        <ShieldCheck size={120} />
-                    </Box>
+                    <div className="relative z-10 mt-4">
+                        <span className="flex items-center text-[10px] font-bold px-2 py-1 rounded-md bg-rose-50 text-rose-600 w-fit">
+                           CRITICAL • {stats?.mostReported?.count || 0} Reports
+                        </span>
+                    </div>
                 </div>
-            </SimpleGrid>
+
+                <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm relative overflow-hidden group min-h-[160px] flex flex-col justify-between border-l-4 border-l-indigo-500">
+                    <TrendingUp size={120} strokeWidth={1} className="absolute -top-2 -right-4 text-slate-900 opacity-[0.12] group-hover:scale-110 group-hover:opacity-[0.18] transition-all duration-700 pointer-events-none" />
+                    <div className="relative z-10">
+                        <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Trend Spotting</p>
+                        <h3 className="text-3xl font-bold text-slate-900 tracking-tight truncate">{stats?.risingIssue?._id || 'N/A'}</h3>
+                    </div>
+                    <div className="relative z-10 mt-4">
+                        <span className="flex items-center text-[10px] font-bold px-2 py-1 rounded-md bg-indigo-50 text-indigo-600 w-fit">
+                           RISING TREND
+                        </span>
+                    </div>
+                </div>
+
+                <div className="bg-slate-900 p-8 rounded-[2rem] border-none shadow-xl relative overflow-hidden group min-h-[160px] flex flex-col justify-between text-white">
+                    <ShieldCheck size={120} strokeWidth={1} className="absolute -top-2 -right-4 text-white opacity-[0.12] group-hover:scale-110 group-hover:opacity-[0.18] transition-all duration-700 pointer-events-none" />
+                    <div className="relative z-10">
+                        <p className="text-indigo-200 text-[10px] font-bold uppercase tracking-widest mb-1">Active Reach</p>
+                        <h3 className="text-4xl font-bold text-[#28e0b6] tracking-tight">4,280</h3>
+                    </div>
+                    <div className="relative z-10 mt-4">
+                        <p className="text-indigo-300 opacity-60 text-[11px] font-medium italic">Growing by 12% MoM</p>
+                    </div>
+                </div>
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 {/* COMPLAINT FEED */}
                 <div className="lg:col-span-8 space-y-6">
-                    <div className="flex justify-between items-center mb-4 bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm">
+                    <div className="flex justify-between items-center mb-4 bg-white p-6 rounded-[1.5rem] border border-slate-100 shadow-sm">
                         <Group>
                             <Filter size={18} className="text-slate-400" />
                             <Select 
@@ -181,137 +213,122 @@ const AdvocateCommunity = () => {
                             />
                         </Group>
                         <Text size="xs" fw={800} c="dimmed uppercase">{posts.length} Complaints tracked</Text>
-                    </div>
-
-                    <Stack gap="xl">
+                    </div>                    <Stack gap="xl">
                         {posts.map((post) => (
-                            <Paper key={post._id} radius="32px" withBorder p={40} className="shadow-sm border-slate-100 group hover:shadow-md transition-shadow relative">
-                                <Group justify="space-between" mb="lg">
-                                    <Group gap="lg">
-                                        <Avatar radius="xl" color="indigo" size="md">#</Avatar>
-                                        <div>
-                                            <div className="flex items-center gap-2">
-                                                <Text fw={900} size="md" className="tracking-tight text-slate-800">{post.title}</Text>
-                                                <Badge color={getStatusColor(post.status)} variant="dot">
-                                                    {post.status.toUpperCase()}
-                                                </Badge>
-                                            </div>
-                                            <Text size="xs" c="dimmed" fw={700}>
-                                                Posted anonymously • {dayjs(post.createdAt).fromNow()}
-                                            </Text>
+                            <div key={post._id} className="bg-white p-10 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-all relative group">
+                                <div className="flex justify-between items-start mb-8">
+                                    <div className="flex gap-6 items-center">
+                                        <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xl border border-indigo-100 uppercase">
+                                            {post.platform[0]}
                                         </div>
-                                    </Group>
+                                        <div>
+                                            <div className="flex items-center gap-3 mb-1">
+                                                <h3 className="text-lg font-bold text-slate-900 tracking-tight leading-none">{post.title}</h3>
+                                                <span className={`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${
+                                                    post.status === 'resolved' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 
+                                                    post.status === 'escalated' ? 'bg-rose-50 text-rose-600 border-rose-100' : 
+                                                    'bg-slate-50 text-slate-500 border-slate-100'
+                                                }`}>
+                                                    {post.status}
+                                                </span>
+                                            </div>
+                                            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+                                                ANONYMOUS • {dayjs(post.createdAt).fromNow().toUpperCase()}
+                                            </p>
+                                        </div>
+                                    </div>
                                     
-                                    <Menu shadow="xl" radius="xl" width={200}>
+                                    <Menu shadow="xl" radius="24px" width={220}>
                                         <Menu.Target>
-                                            <ActionIcon variant="subtle" color="gray"><MoreVertical size={18}/></ActionIcon>
+                                            <ActionIcon variant="light" color="indigo" radius="md" size="lg"><MoreVertical size={20}/></ActionIcon>
                                         </Menu.Target>
-                                        <Menu.Dropdown p={10}>
-                                            <Menu.Label>Advocate Action</Menu.Label>
-                                            <Menu.Item leftSection={<TrendingUp size={14}/>} onClick={() => handleUpdate(post._id, { status: 'escalated' })}>Escalate</Menu.Item>
-                                            <Menu.Item leftSection={<ShieldCheck size={14}/>} onClick={() => handleUpdate(post._id, { status: 'resolved' })}>Resolve</Menu.Item>
-                                            <Divider my={5} />
-                                            <Menu.Item color="gray" onClick={() => handleUpdate(post._id, { status: 'ignored' })}>Ignore</Menu.Item>
+                                        <Menu.Dropdown p={12}>
+                                            <Menu.Label className="text-[10px] font-black uppercase tracking-widest mb-2">Advocate Action</Menu.Label>
+                                            <Menu.Item leftSection={<TrendingUp size={16}/>} className="font-bold text-slate-700" onClick={() => handleUpdate(post._id, { status: 'escalated' })}>Escalate Case</Menu.Item>
+                                            <Menu.Item leftSection={<ShieldCheck size={16}/>} className="font-bold text-slate-700" onClick={() => handleUpdate(post._id, { status: 'resolved' })}>Mark Resolved</Menu.Item>
+                                            <Divider my={8} />
+                                            <Menu.Item color="gray" className="font-bold" onClick={() => handleUpdate(post._id, { status: 'ignored' })}>Archive Thread</Menu.Item>
                                         </Menu.Dropdown>
                                     </Menu>
-                                </Group>
+                                </div>
 
-                                <div className="ml-16">
-                                    <Text size="sm" c="slate.7" className="leading-relaxed font-medium mb-6">
-                                        {post.description}
-                                    </Text>
+                                <div className="pl-20">
+                                    <p className="text-slate-600 text-sm font-medium leading-relaxed mb-8 max-w-[90%] italic">
+                                        "{post.description}"
+                                    </p>
 
-                                    <Group gap="xs">
-                                        <Badge variant="light" color="indigo" size="xs">{post.platform}</Badge>
-                                        <Badge variant="light" color="gray" size="xs">{post.category}</Badge>
+                                    <div className="flex flex-wrap gap-2 items-center">
+                                        <div className="px-3 py-1 transparent-indigo rounded-xl text-[10px] font-black text-indigo-600 border border-indigo-100 uppercase tracking-widest bg-indigo-50">{post.platform}</div>
+                                        <div className="px-3 py-1 bg-slate-50 rounded-xl text-[10px] font-black text-slate-500 border border-slate-100 uppercase tracking-widest">{post.category}</div>
                                         {post.tags && post.tags.map(tag => (
-                                            <Badge key={tag} variant="outline" color="indigo" size="xs">#{tag}</Badge>
+                                            <span key={tag} className="px-3 py-1 bg-indigo-50/30 rounded-xl text-[10px] font-bold text-indigo-400 border border-indigo-100/50 uppercase tracking-widest italic">#{tag}</span>
                                         ))}
 
-                                        {/* CLUSTERING LABEL */}
                                         {getSimilarCount(post) > 1 && (
-                                            <div className="flex items-center gap-1.5 ml-auto">
-                                                <MessageCircle size={14} className="text-rose-500" />
-                                                <Text size="xs" fw={800} c="rose.6" className="uppercase tracking-widest">
+                                            <div className="flex items-center gap-2 ml-auto animate-pulse">
+                                                <AlertTriangle size={14} className="text-rose-500" />
+                                                <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest">
                                                     Systemic Indicator: {getSimilarCount(post)} Reports
-                                                </Text>
+                                                </span>
                                             </div>
                                         )}
-                                    </Group>
-
-                                    {/* Action Buttons Mini */}
-                                    <div className="mt-8 pt-6 border-t border-slate-50 flex gap-4">
-                                        <Button 
-                                            size="compact-xs" 
-                                            variant="light" 
-                                            color="indigo" 
-                                            radius="xl" 
-                                            leftSection={<Tag size={12}/>}
-                                            onClick={() => {
-                                                const tag = prompt('Enter tag:');
-                                                if (tag) handleUpdate(post._id, { tags: [...(post.tags || []), tag] });
-                                            }}
-                                        >
-                                            Add Tag
-                                        </Button>
                                     </div>
                                 </div>
-                            </Paper>
+                            </div>
                         ))}
                     </Stack>
                 </div>
 
                 {/* SIDE ACTIONS */}
-                <div className="lg:col-span-4 space-y-10">
-                    <Card radius="32px" withBorder p={30} className="shadow-sm border-slate-100 sticky top-28 bg-white">
-                        <Group mb="xl">
-                            <ThemeIcon size="xl" radius="xl" color="indigo" variant="light">
-                                <Send size={24} />
-                            </ThemeIcon>
-                            <div>
-                                <h3 className="text-xl font-black text-slate-800 border-none uppercase tracking-tighter">Broadcast</h3>
-                                <Text size="xs" fw={700} c="dimmed">Message to all active workers</Text>
+                <div className="lg:col-span-4">
+                    <div className="bg-white p-10 rounded-[2rem] shadow-xl sticky top-28 border border-slate-100 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 opacity-40 blur-[60px]" />
+                        
+                        <div className="relative z-10 flex items-center gap-4 mb-10">
+                            <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600 shadow-lg shadow-indigo-100/50">
+                                <Send size={24} strokeWidth={2.5} />
                             </div>
-                        </Group>
+                            <div>
+                                <h3 className="text-xl font-bold text-slate-900 tracking-tight leading-none">Broadcast</h3>
+                                <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest mt-1">Global Alert System</p>
+                            </div>
+                        </div>
 
-                        <Stack gap="md">
-                            <Textarea 
-                                placeholder="Enter an announcement, policy update, or warning..." 
-                                minRows={4}
-                                radius="xl"
-                                variant="filled"
+                        <div className="relative z-10 space-y-6">
+                            <textarea 
+                                placeholder="Enter announcement content..." 
+                                className="w-full bg-slate-50 border border-slate-100 rounded-[1.5rem] p-6 text-slate-900 text-sm font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all placeholder:text-slate-300"
+                                rows={5}
                                 value={broadcastMsg}
                                 onChange={(e) => setBroadcastMsg(e.currentTarget.value)}
                             />
-                            <Button 
-                                fullWidth 
-                                color="indigo" 
-                                radius="xl" 
-                                size="md" 
-                                leftSection={<Send size={18}/>}
+                            <button 
+                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-indigo-200 flex items-center justify-center gap-3 uppercase text-xs tracking-widest"
                                 onClick={handleBroadcast}
                             >
-                                Send Broadcast
-                            </Button>
-                        </Stack>
+                                <Send size={16} strokeWidth={3} />
+                                Dispatch Message
+                            </button>
 
-                        <Divider my={30} label="Recent Broadcasts" labelPosition="center" />
-                        
-                        <Stack gap="sm">
-                             <Paper p="md" radius="lg" bg="slate.50" className="border border-slate-100">
-                                <Text size="xs" fw={800} c="slate.8">Delayed Payments - Uber Update</Text>
-                                <Text size="xs" c="dimmed" mt={2}>Sent 2 hours ago</Text>
-                             </Paper>
-                             <Paper p="md" radius="lg" bg="slate.50" className="border border-slate-100">
-                                <Text size="xs" fw={800} c="slate.8">Insurance Policy Change Info</Text>
-                                <Text size="xs" c="dimmed" mt={2}>Sent 1 day ago</Text>
-                             </Paper>
-                        </Stack>
-                    </Card>
+                            <div className="pt-6 border-t border-slate-100 mt-8">
+                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6">Recent Dispatches</p>
+                                <div className="space-y-4">
+                                     <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-all group">
+                                        <p className="text-xs font-bold text-slate-800 tracking-tight mb-1">Delayed Payments - Uber Update</p>
+                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">SENT 2H AGO</p>
+                                     </div>
+                                     <div className="p-5 rounded-2xl bg-slate-50 border border-slate-100 hover:bg-slate-100 transition-all group">
+                                        <p className="text-xs font-bold text-slate-800 tracking-tight mb-1">Insurance Policy Change Info</p>
+                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">SENT 1D AGO</p>
+                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    );
+  );
 };
 
 export default AdvocateCommunity;

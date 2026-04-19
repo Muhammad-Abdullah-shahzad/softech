@@ -20,6 +20,7 @@ import {
   SimpleGrid,
   Avatar
 } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
 import { 
   ChevronLeft, 
   CheckCircle2, 
@@ -31,7 +32,9 @@ import {
   User,
   Calendar,
   Clock,
-  ArrowRight
+  ArrowRight,
+  Check,
+  X
 } from 'lucide-react';
 import dayjs from 'dayjs';
 
@@ -54,7 +57,13 @@ const ReviewDetail = () => {
       setEarning(res.data.data);
     } catch (err) {
       console.error(err);
-      alert('Error fetching details');
+      notifications.show({
+        title: 'Network Error',
+        message: 'Could not retrieve record details from the node',
+        color: 'red',
+        icon: <X size={16} />,
+        radius: 'md'
+      });
     } finally {
       setLoading(false);
     }
@@ -70,11 +79,23 @@ const ReviewDetail = () => {
         verifiedBy: verifier.id || verifier.email,
         verifiedAt: new Date().toISOString()
       });
-      alert(`Record successfully marked as ${status}`);
+      notifications.show({
+        title: 'Review Complete',
+        message: `Record has been updated to ${status.toUpperCase()}`,
+        color: status === 'verified' ? 'teal' : status === 'flagged' ? 'yellow' : 'red',
+        icon: <Check size={16} />,
+        radius: 'md'
+      });
       navigate('/dashboard/verifier/queue');
     } catch (err) {
       console.error(err);
-      alert('Action failed');
+      notifications.show({
+        title: 'Action Failed',
+        message: 'System could not commit your review to the ledger',
+        color: 'red',
+        icon: <X size={16} />,
+        radius: 'md'
+      });
     } finally {
       setActionLoading(false);
     }
@@ -239,11 +260,11 @@ const ReviewDetail = () => {
                   <div className="space-y-4">
                      <div className="bg-slate-50 p-4 rounded-2xl">
                         <Text size="xs" c="dimmed" fw={700} tracking={1} tt="uppercase" mb={4}>Gross Amount</Text>
-                        <Text size="xl" fw={900}>₹{earning.grossAmount.toFixed(2)}</Text>
+                        <Text size="xl" fw={900}>Rs. {earning.grossAmount.toFixed(2)}</Text>
                      </div>
                      <div className="bg-emerald-50 p-4 rounded-2xl">
                         <Text size="xs" c="teal.9" fw={700} tracking={1} tt="uppercase" mb={4}>Net Amount</Text>
-                        <Text size="xl" fw={900} c="teal.7">₹{earning.netAmount.toFixed(2)}</Text>
+                        <Text size="xl" fw={900} c="teal.7">Rs. {earning.netAmount.toFixed(2)}</Text>
                      </div>
                   </div>
                   <div className="space-y-4">
@@ -254,7 +275,7 @@ const ReviewDetail = () => {
                               {earning.deductions.map((d, i) => (
                                 <Group key={i} justify="space-between">
                                   <Text size="xs" fw={500}>{d.description || d.type}</Text>
-                                  <Text size="xs" fw={700} c="red.6">-₹{d.amount}</Text>
+                                  <Text size="xs" fw={700} c="red.6">-Rs. {d.amount}</Text>
                                 </Group>
                               ))}
                            </Stack>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getAdvocateOverview } from '../../api/analytics';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-    PieChart, Pie, Cell, LineChart, Line, Legend, Treemap
+    PieChart, Pie, Cell, LineChart, Line, Legend, Treemap, AreaChart, Area
 } from 'recharts';
 import {
     Card,
@@ -58,12 +58,22 @@ const AdvocateOverview = () => {
         </div>
     );
 
-    const COLORS = ['#28e0b6', '#0f172a', '#10b981', '#f59e0b', '#94a3b8'];
-    const verificationPieData = data.verificationStats.map((item, idx) => ({
+    const CHART_COLORS = ['#6366f1', '#8b5cf6', '#3b82f6', '#14b8a6', '#f43f5e'];
+    const V_COLORS = {
+      'verified': '#10b981',
+      'flagged': '#f43f5e',
+      'unverifiable': '#f59e0b',
+      'pending': '#6366f1',
+      'default': '#94a3b8'
+    };
+
+    const verificationPieData = data.verificationStats.map((item) => ({
         name: item._id,
         value: item.count,
-        color: COLORS[idx % COLORS.length]
+        color: V_COLORS[item._id.toLowerCase()] || V_COLORS.default
     }));
+
+    const totalVerifications = data.verificationStats.reduce((acc, curr) => acc + curr.count, 0);
 
     const allDates = [...new Set(data.commissionTrends.flatMap(p => p.trends.map(t => t.date)))].sort();
     const trendChartData = allDates.map(date => {
@@ -77,267 +87,256 @@ const AdvocateOverview = () => {
 
     return (
         <div className="max-w-[1600px] mx-auto space-y-12 pb-24 px-4">
-            <header className="flex flex-col md:flex-row justify-between items-end gap-6">
-                <div className="space-y-2">
-                    <Badge color="indigo" variant="filled" size="lg" radius="sm">Advocate Intelligence Access</Badge>
-                    <h1 className="text-5xl font-black text-slate-900 border-none tracking-tight uppercase italic leading-[0.9]">
-                        Systemic Fairness <span className="text-indigo-600">Analytics</span>
-                    </h1>
-                    <p className="text-slate-500 font-medium text-lg">Real-time monitoring of platform behavior and worker vulnerability.</p>
+            <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+                <div>
+                    <h2 className="text-2xl font-bold text-slate-900 border-none tracking-tight">Advocate Intelligence Access</h2>
+                    <p className="text-slate-500 font-medium tracking-tight">Real-time monitoring of platform behavior and worker vulnerability.</p>
                 </div>
                 <Group>
-                    <Button variant="default" leftSection={<Download size={16} />} radius="md">Export Data</Button>
-                    <Button color="indigo" radius="md">Live Status</Button>
+                    <Badge size="xl" color="indigo" variant="light" radius="md" py={22} px={20} className="border border-indigo-100">
+                        <Group gap="xs">
+                            <TrendingUp size={16} />
+                            <Text fw={800} size="sm" tt="uppercase" tracking="0.05em">Systemic Fairness Analytics</Text>
+                        </Group>
+                    </Badge>
                 </Group>
             </header>
 
-            <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="xl">
-                <Paper radius="32px" withBorder p="xl" className="border-slate-100 shadow-sm relative overflow-hidden group">
-                    <Stack gap={2}>
-                        <Text size="xs" fw={900} tt="uppercase" c="dimmed">Active Workers</Text>
-                        <Text size="42px" fw={900} className="italic">{data.kpis.totalWorkers}</Text>
-                        <Text size="xs" fw={700} c="indigo.6">Active nodes</Text>
-                    </Stack>
-                    <Users size={80} className="absolute -right-4 -bottom-4 text-slate-50 group-hover:text-indigo-50 transition-colors" />
-                </Paper>
-
-                <Paper radius="32px" withBorder p="xl" className="border-rose-100 bg-rose-50/20 shadow-sm border-l-4 border-l-rose-500">
-                    <Stack gap={2}>
-                        <Text size="xs" fw={900} tt="uppercase" c="rose.9">Vulnerable Households</Text>
-                        <Text size="42px" fw={900} c="rose.7" className="italic">{data.kpis.vulnerableTotal}</Text>
-                        <Text size="xs" fw={700} c="rose.6" className="flex items-center gap-1">
-                            <TrendingUp size={12} /> {">"}20% Income Drop
-                        </Text>
-                    </Stack>
-                </Paper>
-
-                <Paper radius="32px" withBorder p="xl" className="border-slate-100 shadow-sm">
-                    <Stack gap={2}>
-                        <Text size="xs" fw={900} tt="uppercase" c="dimmed">Avg Commission Rate</Text>
-                        <Text size="42px" fw={900} className="italic text-slate-800">{data.kpis.avgCommission}%</Text>
-                        <Text size="xs" fw={700} c="dimmed">System average</Text>
-                    </Stack>
-                </Paper>
-
-                <Paper radius="32px" withBorder p="xl" className="bg-slate-900 text-white border-none shadow-2xl">
-                    <Stack gap={2}>
-                        <Text size="xs" fw={900} tt="uppercase" c="indigo.3">System Community Activity</Text>
-                        <Text size="42px" fw={900} className="italic text-amber-400">{data.kpis.totalGrievances || 0}</Text>
-                        <Text size="xs" fw={700} c="indigo.1" opacity={0.6}>Total workers discussing issues</Text>
-                    </Stack>
-                </Paper>
-            </SimpleGrid>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <Card radius="40px" withBorder p={40} className="lg:col-span-2 shadow-sm border-slate-100">
-                    <Group justify="space-between" mb={40}>
-                        <div>
-                            <h3 className="text-2xl font-black text-slate-800 border-none italic uppercase tracking-tighter">Commission Rate Trends</h3>
-                            <Text size="sm" c="dimmed" fw={600}>Longitudinal analysis of platform take-rates.</Text>
-                        </div>
-                        <Select placeholder="Period" data={['Last 30 Days']} defaultValue="Last 30 Days" radius="md" size="sm" />
-                    </Group>
-                    <div className="h-96">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={trendChartData}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 700 }} dy={10} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 700 }} />
-                                <Tooltip contentStyle={{ borderRadius: '20px', border: 'none', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }} />
-                                <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
-                                {data.commissionTrends.map((p, i) => (
-                                    <Line key={p._id} type="monotone" dataKey={p._id} stroke={COLORS[i % COLORS.length]} strokeWidth={4} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 8 }} />
-                                ))}
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </div>
-                </Card>
-
-                <Card radius="40px" withBorder p={40} className="shadow-sm border-slate-100">
-                    <h3 className="text-xl font-black text-slate-800 border-none italic uppercase mb-2">Evidence Integrity</h3>
-                    <Text size="sm" c="dimmed" fw={600} mb={40}>Verification breakdown.</Text>
-                    <div className="h-64 mb-8">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie data={verificationPieData} cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={8} dataKey="value">
-                                    {verificationPieData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
-                                </Pie>
-                                <Tooltip />
-                            </PieChart>
-                        </ResponsiveContainer>
-                    </div>
-                    <Stack gap="xs">
-                        {verificationPieData.map((d, i) => (
-                            <Group key={i} justify="space-between" p="md" radius="xl" className="bg-slate-50/50">
-                                <Group gap="xs">
-                                    <Box w={12} h={12} bg={d.color} style={{ borderRadius: '4px' }} />
-                                    <Text size="sm" fw={800} className="uppercase tracking-tight">{d.name}</Text>
-                                </Group>
-                                <Text size="sm" fw={900}>{d.value}</Text>
-                            </Group>
-                        ))}
-                    </Stack>
-                </Card>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                <Card radius="40px" withBorder p={40} className="shadow-sm border-slate-100">
-                    <Group justify="space-between" mb={30}>
-                        <h3 className="text-2xl font-black text-slate-800 border-none italic uppercase tracking-tighter">Platform Fairness Index</h3>
-                        <Badge variant="filled" color="indigo" radius="md" size="lg">RANKED</Badge>
-                    </Group>
-                    
-                    <Stack gap="xl">
-                        {data.platformFairness && data.platformFairness.length > 0 ? data.platformFairness.map((plat, i) => (
-                            <div key={i} className="group">
-                                <Group justify="space-between" mb={12}>
-                                    <Group gap="md">
-                                        <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center font-black text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
-                                            {plat.platform[0]}
-                                        </div>
-                                        <div>
-                                            <Text fw={900} size="md" className="tracking-tight lowercase">{plat.platform}</Text>
-                                            <Text size="xs" c="dimmed" fw={700}>Based on {data.kpis.totalWorkers} data points</Text>
-                                        </div>
-                                    </Group>
-                                    <div className="text-right">
-                                        <Text fw={1000} size="xl" c={plat.score > 70 ? 'emerald.7' : plat.score > 50 ? 'amber.7' : 'rose.7'}>
-                                            {plat.score}
-                                        </Text>
-                                        <Text size="xs" fw={800} tt="uppercase" opacity={0.5}>Fairness Score</Text>
-                                    </div>
-                                </Group>
-                                <div className="h-2 w-full bg-slate-50 rounded-full overflow-hidden">
-                                    <div 
-                                        className={`h-full transition-all duration-1000 ${plat.score > 70 ? 'bg-emerald-500' : plat.score > 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
-                                        style={{ width: `${plat.score}%` }}
-                                    />
-                                </div>
-                            </div>
-                        )) : (
-                            <Text align="center" c="dimmed">No ranking data available.</Text>
-                        )}
-                    </Stack>
-
-                    <Paper mt={40} p="xl" radius="24px" className="bg-slate-50 border border-slate-100 italic">
-                        <Text size="xs" fw={700} c="slate.5">
-                            💡 {data.platformFairness[0]?.platform} is currently the most ethical platform with a score of {data.platformFairness[0]?.score}/100.
-                        </Text>
-                    </Paper>
-                </Card>
-
-                <Card radius="40px" withBorder p={40} className="shadow-sm border-slate-100">
-                    <Group justify="space-between" mb={10}>
-                        <h3 className="text-2xl font-black text-slate-800 border-none italic uppercase tracking-tighter">City Earnings Comparison</h3>
-                        <MapPin size={24} className="text-indigo-500" />
-                    </Group>
-                    <Text size="sm" c="dimmed" fw={600} mb={30}>Average worker earnings across major metropolitan clusters.</Text>
-                    
-                    <div className="h-80">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={data.distribution} layout="vertical">
-                                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
-                                <XAxis type="number" hide />
-                                <YAxis 
-                                    dataKey="_id" 
-                                    type="category" 
-                                    axisLine={false} 
-                                    tickLine={false} 
-                                    tick={{ fill: '#475569', fontSize: 13, fontWeight: 900 }} 
-                                    width={120} 
-                                />
-                                <Tooltip 
-                                    cursor={{ fill: 'transparent' }} 
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
-                                />
-                                <Bar dataKey="avg" fill="#28e0b6" radius={[0, 10, 10, 0]} barSize={40}>
-                                    {data.distribution.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-
-                    <div className="mt-8 space-y-4">
-                        <Paper p="md" radius="xl" bg="slate.50" className="border border-slate-100 flex justify-between items-center px-8">
-                             <Text size="xs" fw={800} c="dimmed" tt="uppercase">Highest Earning City</Text>
-                             <Text size="sm" fw={900} c="indigo.7" className="italic">{[...data.distribution].sort((a,b) => b.avg - a.avg)[0]?._id  || 'N/A'}</Text>
-                        </Paper>
-                        
-                        <Divider my="sm" variant="dashed" label="Anomalies" labelPosition="center" />
-
-                        {data.spikes && data.spikes.length > 0 ? data.spikes.map((spike, idx) => (
-                            <Paper key={idx} p="xl" radius="24px" className="bg-amber-50 border border-amber-100">
-                                <Group gap="lg">
-                                    <ThemeIcon size="xl" color="amber" variant="filled" radius="md"><Zap size={20} /></ThemeIcon>
-                                    <div className="flex-1">
-                                        <Text fw={900} size="sm" className="uppercase tracking-tight">Commission Spike</Text>
-                                        <Text size="xs" fw={700} c="amber.9">{spike.platform} rates rose by {spike.increase}% (to {spike.currentRate}%).</Text>
-                                    </div>
-                                    <Button size="xs" color="amber">Investigate</Button>
-                                </Group>
-                            </Paper>
-                        )) : (
-                            <Paper p="xl" radius="24px" className="bg-emerald-50 border border-emerald-100">
-                                <Group gap="lg">
-                                    <ThemeIcon size="xl" color="teal" variant="filled" radius="md"><ShieldCheck size={20} /></ThemeIcon>
-                                    <Text fw={800} size="sm" c="teal.9">No anomalous commission spikes detected currently.</Text>
-                                </Group>
-                            </Paper>
-                        )}
-                    </div>
-                </Card>
-            </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all relative overflow-hidden group min-h-[160px] flex flex-col justify-between">
+          <Users size={120} strokeWidth={1} className="absolute -top-2 -right-4 text-slate-900 opacity-[0.12] group-hover:scale-110 group-hover:opacity-[0.18] transition-all duration-700 pointer-events-none" />
+          <div className="relative z-10">
+              <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Active Workers</p>
+              <h3 className="text-4xl font-bold text-slate-900 tracking-tight">{data.kpis.totalWorkers}</h3>
+          </div>
+          <div className="relative z-10 flex justify-between items-end mt-4">
+              <p className="text-slate-400 text-[11px] font-medium italic">Active nodes</p>
+          </div>
         </div>
-    );
-};
 
-const CustomTreemapContent = (props) => {
-    const { x, y, width, height, index, name, hourly } = props;
-    const COLORS = ['#28e0b6', '#4dffc8', '#80ffd9', '#b3ffeb', '#e0fff8'];
+        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all border-l-4 border-l-rose-500 relative overflow-hidden group min-h-[160px] flex flex-col justify-between">
+          <AlertTriangle size={120} strokeWidth={1} className="absolute -top-2 -right-4 text-slate-900 opacity-[0.12] group-hover:scale-110 group-hover:opacity-[0.18] transition-all duration-700 pointer-events-none" />
+          <div className="relative z-10">
+              <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Vulnerable Households</p>
+              <h3 className="text-4xl font-bold text-slate-900 tracking-tight">{data.kpis.vulnerableTotal}</h3>
+          </div>
+          <div className="relative z-10 flex justify-between items-end mt-4">
+              <span className="flex items-center text-[10px] font-bold px-2 py-1 rounded-md bg-rose-50 text-rose-600">
+                <TrendingUp size={12} className="mr-1" />
+                {">"}20% Income Drop
+              </span>
+          </div>
+        </div>
 
-    return (
-        <g>
-            <rect
-                x={x}
-                y={y}
-                width={width}
-                height={height}
-                style={{
-                    fill: COLORS[index % COLORS.length],
-                    stroke: '#fff',
-                    strokeWidth: 2,
-                    strokeOpacity: 1,
-                }}
-            />
-            {width > 50 && height > 30 && (
-                <text
-                    x={x + width / 2}
-                    y={y + height / 2 - 5}
-                    textAnchor="middle"
-                    fill="#fff"
-                    fontSize={12}
-                    fontWeight={900}
-                    className="uppercase tracking-tighter"
+        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all relative overflow-hidden group min-h-[160px] flex flex-col justify-between">
+          <TrendingUp size={120} strokeWidth={1} className="absolute -top-2 -right-4 text-slate-900 opacity-[0.12] group-hover:scale-110 group-hover:opacity-[0.18] transition-all duration-700 pointer-events-none" />
+          <div className="relative z-10">
+              <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Avg Commission Rate</p>
+              <h3 className="text-4xl font-bold text-slate-900 tracking-tight">{data.kpis.avgCommission}%</h3>
+          </div>
+          <div className="relative z-10 flex justify-between items-end mt-4">
+              <p className="text-slate-400 text-[11px] font-medium italic">System average</p>
+          </div>
+        </div>
+
+        <div className="bg-slate-900 p-6 rounded-3xl border-none shadow-xl hover:shadow-2xl transition-all relative overflow-hidden group min-h-[160px] flex flex-col justify-between text-white">
+          <ShieldCheck size={120} strokeWidth={1} className="absolute -top-2 -right-4 text-white opacity-[0.12] group-hover:scale-110 group-hover:opacity-[0.18] transition-all duration-700 pointer-events-none" />
+          <div className="relative z-10">
+              <p className="text-indigo-200 text-[10px] font-bold uppercase tracking-widest mb-1">System Community</p>
+              <h3 className="text-4xl font-bold text-[#28e0b6] tracking-tight">{data.kpis.totalGrievances || 0}</h3>
+          </div>
+          <div className="relative z-10 flex justify-between items-end mt-4">
+              <p className="text-indigo-300 opacity-60 text-[11px] font-medium italic">Total workers discussing issues</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Dashboard Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Commission Trends - Large Block */}
+        <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
+          <div className="flex justify-between items-center mb-10">
+            <div>
+              <h3 className="text-xl font-bold text-slate-800 tracking-tight">Commission Rate Trends</h3>
+              <p className="text-slate-400 text-xs font-medium">Longitudinal analysis of platform take-rates.</p>
+            </div>
+            <div className="text-[10px] font-bold text-slate-400 bg-slate-50 px-3 py-1.5 rounded-xl uppercase tracking-widest border border-slate-100">
+              Last 30 Days
+            </div>
+          </div>
+          
+          <div className="h-80 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={trendChartData}>
+                <defs>
+                  {data.commissionTrends.map((p, i) => (
+                    <linearGradient key={`grad-${p._id}`} id={`color-${p._id}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={CHART_COLORS[i % CHART_COLORS.length]} stopOpacity={0.15}/>
+                      <stop offset="95%" stopColor={CHART_COLORS[i % CHART_COLORS.length]} stopOpacity={0}/>
+                    </linearGradient>
+                  ))}
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }} />
+                <Tooltip 
+                  contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.1)' }} 
+                  cursor={{ stroke: '#cbd5e1', strokeWidth: 1 }}
+                />
+                <Legend iconType="circle" wrapperStyle={{ paddingTop: '30px' }} />
+                {data.commissionTrends.map((p, i) => (
+                  <Area 
+                    key={p._id} 
+                    type="monotone" 
+                    dataKey={p._id} 
+                    stroke={CHART_COLORS[i % CHART_COLORS.length]} 
+                    strokeWidth={3} 
+                    fillOpacity={1} 
+                    fill={`url(#color-${p._id})`} 
+                  />
+                ))}
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Verification Split - Small Block */}
+        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm relative overflow-hidden group">
+          <div className="mb-6">
+            <h3 className="text-xl font-bold text-slate-800 tracking-tight">System Health</h3>
+            <p className="text-slate-400 text-xs font-medium">Verification status breakdown.</p>
+          </div>
+
+          <div className="h-64 w-full relative mb-10 flex items-center justify-center">
+            {/* Central Label for Donut */}
+            <div className="absolute flex flex-col items-center justify-center pb-2">
+               <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Total</span>
+               <span className="text-3xl font-black text-slate-900 tracking-tighter">{totalVerifications}</span>
+            </div>
+
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie 
+                  data={verificationPieData} 
+                  cx="50%" cy="50%" 
+                  innerRadius={75} outerRadius={95} 
+                  paddingAngle={6} 
+                  dataKey="value"
+                  strokeWidth={0}
+                  animationBegin={0}
+                  animationDuration={1500}
                 >
-                    {name}
-                </text>
-            )}
-            {width > 50 && height > 50 && (
-                <text
-                    x={x + width / 2}
-                    y={y + height / 2 + 15}
-                    textAnchor="middle"
-                    fill="#fff"
-                    fontSize={10}
-                    fontWeight={700}
-                >
-                    ₹{hourly}/hr
-                </text>
-            )}
-        </g>
-    );
+                  {verificationPieData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
+                </Pie>
+                <Tooltip 
+                   contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.1)' }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            {verificationPieData.map((d, i) => (
+              <div key={i} className="flex flex-col p-4 rounded-3xl bg-slate-50/50 border border-slate-100/50 hover:bg-slate-50 transition-colors">
+                <div className="flex items-center gap-2 mb-1">
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: d.color }} />
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest truncate">{d.name}</span>
+                </div>
+                <span className="text-xl font-black text-slate-800 tracking-tight leading-none">{d.value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Primary Insights Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4">
+        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+           <div className="flex justify-between items-center mb-8">
+              <h3 className="text-xl font-bold text-slate-800 tracking-tight text-center uppercase">Platform Fairness Ranking</h3>
+              <div className="px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 text-[10px] font-black uppercase tracking-widest border border-indigo-100">Live Index</div>
+           </div>
+           
+           <div className="space-y-6">
+              {data.platformFairness && data.platformFairness.slice(0, 4).map((plat, i) => (
+                <div key={i} className="group">
+                  <div className="flex justify-between items-center mb-2 px-1">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center font-bold text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors uppercase">
+                          {plat.platform[0]}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold text-slate-800 uppercase tracking-tighter leading-none">{plat.platform}</span>
+                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Ethical Compliance</span>
+                      </div>
+                    </div>
+                    <div className="text-right flex flex-col items-end">
+                       <span className={`text-xl font-black italic tracking-tighter leading-none ${plat.score > 70 ? 'text-emerald-500' : plat.score > 50 ? 'text-amber-500' : 'text-rose-500'}`}>
+                          {plat.score}%
+                       </span>
+                    </div>
+                  </div>
+                  <div className="h-1.5 w-full bg-slate-50 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full transition-all duration-1000 ${plat.score > 70 ? 'bg-emerald-500' : plat.score > 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                      style={{ width: `${plat.score}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+           </div>
+        </div>
+
+        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-col justify-between">
+           <div>
+              <div className="flex justify-between items-center mb-8">
+                 <h3 className="text-xl font-bold text-slate-800 tracking-tight text-center uppercase">System Integrity Alerts</h3>
+                 <Zap size={20} className="text-amber-500 animate-pulse" />
+              </div>
+
+              <div className="space-y-4">
+                {data.spikes && data.spikes.length > 0 ? data.spikes.map((spike, idx) => (
+                  <div key={idx} className="p-6 rounded-3xl bg-rose-50 border border-rose-100 shadow-sm shadow-rose-100/20 group hover:scale-[1.02] transition-all">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-2xl bg-rose-500 flex items-center justify-center text-white shadow-lg shadow-rose-200">
+                        <AlertTriangle size={18} strokeWidth={2.5} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-[10px] font-black text-rose-800 uppercase tracking-[0.15em] mb-1">Commission Spike</p>
+                        <p className="text-xs font-bold text-rose-700 leading-tight">
+                          {spike.platform} rates rose to {spike.currentRate}% (↑{spike.increase}%).
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )) : (
+                  <div className="p-10 rounded-2xl bg-emerald-50/50 border border-dashed border-emerald-200 flex flex-col items-center justify-center text-center">
+                    <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 mb-4">
+                      <ShieldCheck size={24} />
+                    </div>
+                    <p className="text-xs font-bold text-emerald-700 uppercase tracking-widest leading-loose">No Anomalies Found</p>
+                    <p className="text-[10px] text-emerald-600 font-medium italic">Commission structures remain stable.</p>
+                  </div>
+                )}
+              </div>
+           </div>
+
+           <div className="mt-8 p-6 rounded-2xl bg-slate-900 text-white relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500 opacity-20 blur-[40px]" />
+              <div className="relative z-10 flex justify-between items-center">
+                 <div className="flex flex-col">
+                    <span className="text-[10px] font-black text-indigo-300 uppercase tracking-[0.2em] mb-1">Highest Yield City</span>
+                    <span className="text-xl font-black italic tracking-tighter uppercase text-[#28e0b6]">{[...data.distribution].sort((a,b) => b.avg - a.avg)[0]?._id  || 'N/A'}</span>
+                 </div>
+                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
+                    <MapPin size={18} className="text-white" />
+                 </div>
+              </div>
+           </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default AdvocateOverview;

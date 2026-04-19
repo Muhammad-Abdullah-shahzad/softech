@@ -1,6 +1,6 @@
 import {
   LayoutDashboard,
-  IndianRupee,
+  Wallet,
   UploadCloud,
   BarChart3,
   FileText,
@@ -17,7 +17,7 @@ export const navigationConfig = {
       title: 'Main',
       links: [
         { label: 'Dashboard', path: '/dashboard/worker', icon: LayoutDashboard },
-        { label: 'Earnings', path: '/dashboard/worker/earnings', icon: IndianRupee },
+        { label: 'Earnings', path: '/dashboard/worker/earnings', icon: Wallet },
         { label: 'Upload & Verify', path: '/dashboard/worker/upload', icon: UploadCloud },
         { label: 'Anomalies', path: '/dashboard/worker/anomalies', icon: ShieldCheck },
       ]

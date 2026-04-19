@@ -80,7 +80,7 @@ const FlaggedRecords = () => {
                       </Group>
                     </Table.Td>
                     <Table.Td>
-                       <Text size="sm" fw={700}>₹{item.netAmount}</Text>
+                       <Text size="sm" fw={700}>Rs. {item.netAmount}</Text>
                     </Table.Td>
                     <Table.Td>
                        <Button 

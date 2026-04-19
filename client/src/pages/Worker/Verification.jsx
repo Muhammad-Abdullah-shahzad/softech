@@ -11,6 +11,8 @@ import {
 import { getEarnings, updateEarning } from '../../api/earnings';
 import { uploadToCloudinary } from '../../utils/cloudinary';
 import { FileInput, Button, Badge, Timeline, Text, Group } from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import { Check, X } from 'lucide-react';
 
 const Verification = () => {
   const [earnings, setEarnings] = useState([]);
@@ -45,11 +47,23 @@ const Verification = () => {
         verificationStatus: 'pending'
       });
 
-      alert('Upload successful! Status changed to Pending.');
+      notifications.show({
+        title: 'Evidence Submitted',
+        message: 'Your screenshot has been uploaded. Status changed to Pending.',
+        color: 'fairgig',
+        icon: <Check size={16} />,
+        radius: 'md'
+      });
       fetchEarnings();
       setSelectedFile(null);
     } catch (err) {
-      alert(err.message || 'Upload failed');
+      notifications.show({
+        title: 'Upload Failed',
+        message: err.message || 'Verification node rejected the file',
+        color: 'red',
+        icon: <X size={16} />,
+        radius: 'md'
+      });
     } finally {
       setUploadingId(null);
     }
@@ -94,7 +108,7 @@ const Verification = () => {
                   </div>
                   <div>
                     <h4 className="font-bold text-slate-900">{item.platform}</h4>
-                    <p className="text-sm text-slate-500">{item.shiftStart?.split('T')[0]} • ₹{item.grossAmount}</p>
+                    <p className="text-sm text-slate-500">{item.shiftStart?.split('T')[0]} • Rs. {item.grossAmount}</p>
                   </div>
                 </div>
 

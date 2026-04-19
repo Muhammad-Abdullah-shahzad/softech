@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   getEarnings 
 } from '../../api/earnings';
+import { PlatformDisplay } from '../../components/CompanyLogo';
 import { 
   Table, 
   Badge, 
@@ -126,14 +127,12 @@ const VerificationQueue = () => {
                       </Group>
                     </Table.Td>
                     <Table.Td>
-                      <Badge variant="dot" color="dark" size="md" radius="sm">
-                        {item.platform}
-                      </Badge>
+                      <PlatformDisplay platform={item.platform} size="sm" />
                     </Table.Td>
                     <Table.Td>
                       <div className="space-y-1">
-                        <Text size="sm" fw={800} c="teal.7">₹{item.netAmount.toFixed(2)}</Text>
-                        <Text size="xs" c="dimmed">Gross: ₹{item.grossAmount}</Text>
+                        <Text size="sm" fw={800} c="teal.7">Rs. {item.netAmount.toFixed(2)}</Text>
+                        <Text size="xs" c="dimmed">Gross: Rs. {item.grossAmount}</Text>
                       </div>
                     </Table.Td>
                     <Table.Td>

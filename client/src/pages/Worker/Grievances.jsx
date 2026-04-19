@@ -10,6 +10,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { getGrievances, createGrievance } from '../../api/grievance';
+import { CompanyLogo, PlatformDisplay } from '../../components/CompanyLogo';
 import { Modal, TextInput, Textarea, Select, Button, Badge, Timeline, Text, Avatar, Divider } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 
@@ -113,7 +114,10 @@ const Grievances = () => {
                         <span className="text-[10px] font-bold text-slate-400">{item.createdAt.split('T')[0]}</span>
                     </div>
                     <h4 className="font-bold text-slate-800 line-clamp-1">{item.title}</h4>
-                    <p className="text-xs text-slate-500 mt-1">{item.platform} • {item.category}</p>
+                    <div className="text-xs text-slate-500 mt-2 flex items-center gap-1.5">
+                        <CompanyLogo platform={item.platform} size="xs" /> 
+                        <span className="font-medium text-slate-600">{item.platform}</span> • {item.category}
+                    </div>
                 </div>
             ))}
         </div>
@@ -126,7 +130,7 @@ const Grievances = () => {
                 <div className="p-8 border-b border-slate-50 bg-slate-50/50">
                     <div className="flex justify-between items-center mb-6">
                         <div className="flex gap-4 items-center">
-                            <Avatar color="indigo" radius="xl">{selectedGrievance.platform[0]}</Avatar>
+                            <CompanyLogo platform={selectedGrievance.platform} size="lg" />
                             <div>
                                 <h3 className="text-xl font-bold text-slate-900 border-none">{selectedGrievance.title}</h3>
                                 <p className="text-sm text-slate-500">Case ID: {selectedGrievance._id.substring(0,8).toUpperCase()}</p>
@@ -153,7 +157,7 @@ const Grievances = () => {
                         </div>
                         <div className="space-y-1">
                              <p className="text-[10px] font-bold text-slate-400 uppercase">Platform</p>
-                             <p className="font-semibold text-slate-800">{selectedGrievance.platform}</p>
+                             <div className="font-semibold text-slate-800"><PlatformDisplay platform={selectedGrievance.platform} /></div>
                         </div>
                     </div>
 
@@ -229,6 +233,7 @@ const Grievances = () => {
                     data={['Uber', 'Careem', 'Yango', 'Bykea', 'Foodpanda', 'Fiverr', 'Upwork', 'Freelancer']}
                     value={formData.platform}
                     onChange={(val) => setFormData({...formData, platform: val})}
+                    renderOption={({ option }) => <PlatformDisplay platform={option.value} size="sm" />}
                />
                <Select 
                     label="Category"

@@ -11,8 +11,11 @@ import {
   FileX
 } from 'lucide-react';
 import { getEarnings, addEarning, updateEarning, deleteEarning } from '../../api/earnings';
+import { PlatformDisplay } from '../../components/CompanyLogo';
 import { Modal, TextInput, Select, NumberInput, Button, Badge, Group, ActionIcon, Table } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
+import { Check, X } from 'lucide-react';
 
 const Earnings = () => {
   const [earnings, setEarnings] = useState([]);
@@ -82,8 +85,21 @@ const Earnings = () => {
         grossEarnings: 0,
         deductions: 0
       });
+      notifications.show({
+        title: 'Entry Saved',
+        message: `Record for ${formData.platform} logged successfully`,
+        color: 'fairgig',
+        icon: <Check size={16} />,
+        radius: 'md'
+      });
     } catch (err) {
-      alert(err.message || 'Action failed');
+      notifications.show({
+        title: 'Action Failed',
+        message: err.message || 'System node rejected the entry',
+        color: 'red',
+        icon: <X size={16} />,
+        radius: 'md'
+      });
     }
   };
 
@@ -92,15 +108,34 @@ const Earnings = () => {
       try {
         await deleteEarning(id);
         fetchData();
+        notifications.show({
+          title: 'Record Deleted',
+          message: 'Entry removed from the ledger',
+          color: 'gray',
+          icon: <Check size={16} />,
+          radius: 'md'
+        });
       } catch (err) {
-        alert('Delete failed');
+        notifications.show({
+          title: 'Delete Failed',
+          message: 'System could not purge the record',
+          color: 'red',
+          icon: <X size={16} />,
+          radius: 'md'
+        });
       }
     }
   };
 
   const handleEdit = (item) => {
     if (item.status === 'verified') {
-      alert('Verified records cannot be edited');
+      notifications.show({
+        title: 'Access Denied',
+        message: 'Verified records are locked and cannot be edited',
+        color: 'rose',
+        icon: <X size={16} />,
+        radius: 'md'
+      });
       return;
     }
     setEditingItem(item);
@@ -158,21 +193,17 @@ const Earnings = () => {
               className="w-full pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"
             />
           </div>
-          <select 
-            className="bg-slate-50 border-none rounded-xl text-sm px-4 py-2 ring-1 ring-slate-100"
+          <Select 
+            placeholder="All Platforms"
+            data={['All', 'Uber', 'Careem', 'Yango', 'Bykea', 'Foodpanda', 'Fiverr', 'Upwork', 'Freelancer']}
             value={filterPlatform}
-            onChange={(e) => setFilterPlatform(e.target.value)}
-          >
-            <option value="All">All Platforms</option>
-            <option value="Uber">Uber</option>
-            <option value="Careem">Careem</option>
-            <option value="Yango">Yango</option>
-            <option value="Bykea">Bykea</option>
-            <option value="Foodpanda">Foodpanda</option>
-            <option value="Fiverr">Fiverr</option>
-            <option value="Upwork">Upwork</option>
-            <option value="Freelancer">Freelancer</option>
-          </select>
+            onChange={(val) => setFilterPlatform(val || 'All')}
+            renderOption={({ option }) => {
+                if (option.value === 'All') return <span className="font-semibold text-slate-700 px-2">All Platforms</span>;
+                return <PlatformDisplay platform={option.value} size="sm" />;
+            }}
+            classNames={{ input: 'bg-slate-50 border-none rounded-xl text-sm ring-1 ring-slate-100 min-w-[200px]' }}
+          />
         </div>
 
         <div className="overflow-x-auto">
@@ -186,15 +217,14 @@ const Earnings = () => {
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Deductions</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Net</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase">Status</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {loading ? (
-                <tr><td colSpan="8" className="px-6 py-10 text-center text-slate-400">Loading your data...</td></tr>
+                <tr><td colSpan="7" className="px-6 py-10 text-center text-slate-400">Loading your data...</td></tr>
               ) : filteredEarnings.length === 0 ? (
                 <tr>
-                    <td colSpan="8" className="px-6 py-10 text-center">
+                    <td colSpan="7" className="px-6 py-10 text-center">
                         <div className="flex flex-col items-center gap-2 text-slate-400">
                             <FileX size={48} strokeWidth={1}/>
                             <p>No records found matching your filters.</p>
@@ -205,43 +235,19 @@ const Earnings = () => {
                 <tr key={item._id} className="hover:bg-slate-50/50 transition-colors group">
                   <td className="px-6 py-4 text-sm font-medium text-slate-700">{item.shiftStart ? item.shiftStart.split('T')[0] : 'N/A'}</td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-bold">
-                        {item.platform ? item.platform[0] : '?'}
-                      </div>
-                      <span className="text-sm font-semibold">{item.platform}</span>
-                    </div>
+                    <PlatformDisplay platform={item.platform} size="sm" />
                   </td>
                   <td className="px-6 py-4 text-sm text-center">
                     {item.shiftStart && item.shiftEnd ? 
                         Math.round((new Date(item.shiftEnd) - new Date(item.shiftStart)) / (1000 * 60 * 60)) : 
                         0}h
                   </td>
-                  <td className="px-6 py-4 text-sm font-semibold text-slate-800">₹{item.grossAmount || 0}</td>
+                  <td className="px-6 py-4 text-sm font-semibold text-slate-800">Rs. {item.grossAmount || 0}</td>
                   <td className="px-6 py-4 text-sm text-rose-500">
-                    ₹{Array.isArray(item.deductions) ? item.deductions.reduce((sum, d) => sum + d.amount, 0) : 0}
+                    Rs. {Array.isArray(item.deductions) ? item.deductions.reduce((sum, d) => sum + d.amount, 0) : 0}
                   </td>
-                  <td className="px-6 py-4 text-sm font-bold text-emerald-600">₹{item.netAmount || 0}</td>
+                  <td className="px-6 py-4 text-sm font-bold text-emerald-600">Rs. {item.netAmount || 0}</td>
                   <td className="px-6 py-4">{getStatusBadge(item.verificationStatus || 'unverified')}</td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ActionIcon 
-                         variant="subtle" 
-                         color="gray" 
-                         disabled={item.status === 'verified'}
-                         onClick={() => handleEdit(item)}
-                      >
-                        <Edit2 size={16} />
-                      </ActionIcon>
-                      <ActionIcon 
-                        variant="subtle" 
-                        color="red"
-                        onClick={() => handleDelete(item._id)}
-                      >
-                        <Trash2 size={16} />
-                      </ActionIcon>
-                    </div>
-                  </td>
                 </tr>
               ))}
             </tbody>
@@ -270,6 +276,7 @@ const Earnings = () => {
             data={['Uber', 'Careem', 'Yango', 'Bykea', 'Foodpanda', 'Fiverr', 'Upwork', 'Freelancer', 'Other']}
             value={formData.platform}
             onChange={(val) => setFormData({...formData, platform: val})}
+            renderOption={({ option }) => <PlatformDisplay platform={option.value} size="sm" />}
             required
           />
           <div className="grid grid-cols-2 gap-4">
@@ -283,7 +290,7 @@ const Earnings = () => {
                 required
              />
              <NumberInput 
-                label="Gross Earnings (₹)" 
+                label="Gross Earnings (Rs.)" 
                 min={0} 
                 value={formData.grossEarnings}
                 onChange={(val) => setFormData({...formData, grossEarnings: val})}
@@ -291,7 +298,7 @@ const Earnings = () => {
              />
           </div>
           <NumberInput 
-            label="Deductions (₹)" 
+            label="Deductions (Rs.)" 
             min={0}
             value={formData.deductions}
             onChange={(val) => setFormData({...formData, deductions: val})}

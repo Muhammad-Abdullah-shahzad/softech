@@ -4,7 +4,7 @@ import {
   ShieldAlert, 
   ArrowRight, 
   Calendar, 
-  IndianRupee, 
+  Banknote, 
   ExternalLink,
   ChevronRight
 } from 'lucide-react';
@@ -106,7 +106,7 @@ const Anomalies = () => {
                                                 </div>
                                             </Group>
                                             <div className="sm:text-right">
-                                                <Text size="xl" fw={900} className="italic text-slate-800 tracking-tight">₹{anomaly.earningRef.amount}</Text>
+                                                <Text size="xl" fw={900} className="italic text-slate-800 tracking-tight">Rs. {anomaly.earningRef.amount}</Text>
                                                 <Text size="xs" fw={700} c="slate.4">Reported Payout</Text>
                                             </div>
                                         </div>

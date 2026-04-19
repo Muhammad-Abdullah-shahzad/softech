@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { notifications } from '@mantine/notifications';
+import { Check, X } from 'lucide-react';
 
 /**
  * Minimalist Login Page
@@ -29,15 +31,35 @@ const Login = () => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         
+        notifications.show({
+          title: 'Identity Verified',
+          message: `Welcome back, ${data.user.fullName}`,
+          color: 'fairgig',
+          icon: <Check size={16} />,
+          radius: 'md'
+        });
+
         if (data.user.role === 'worker') navigate('/dashboard/worker');
         else if (data.user.role === 'advocate') navigate('/dashboard/advocate');
         else navigate('/dashboard/verifier');
       } else {
-        alert(data.message || 'Login failed');
+        notifications.show({
+          title: 'Login Failed',
+          message: data.message || 'Identity verification failed',
+          color: 'red',
+          icon: <X size={16} />,
+          radius: 'md'
+        });
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert('An error occurred. Please try again.');
+      notifications.show({
+        title: 'System Error',
+        message: 'Could not connect to authentication node',
+        color: 'red',
+        icon: <X size={16} />,
+        radius: 'md'
+      });
     }
   };
 

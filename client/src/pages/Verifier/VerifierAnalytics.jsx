@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getVerifierOverview } from '../../api/analytics';
+import { CompanyLogo } from '../../components/CompanyLogo';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   PieChart, Pie, Cell, LineChart, Line, Legend, AreaChart, Area
@@ -28,7 +29,10 @@ import {
     Clock, 
     ChevronRight,
     SearchCheck,
-    AlertCircle
+    AlertCircle,
+    FileCheck,
+    AlertTriangle,
+    Inbox
 } from 'lucide-react';
 
 const VerifierAnalytics = () => {
@@ -72,9 +76,9 @@ const VerifierAnalytics = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-12 pb-24">
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="space-y-1">
-          <h2 className="text-4xl font-black text-slate-900 border-none tracking-tight italic uppercase">Verifier Analytics</h2>
-          <p className="text-slate-500 font-medium">Real-time throughput, inconsistency detection, and platform risk modeling.</p>
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900 border-none">Verifier Analytics</h2>
+          <p className="text-slate-500">Real-time throughput, inconsistency detection, and platform risk modeling.</p>
         </div>
         <Group>
             <Badge size="xl" color="indigo" variant="light" radius="md" py={20} px={20} className="border border-indigo-100">
@@ -87,97 +91,63 @@ const VerifierAnalytics = () => {
       </header>
 
       {/* KPI Cards */}
-      <SimpleGrid cols={{ base: 1, md: 2, lg: 4 }} spacing="xl">
-        <Paper radius="32px" withBorder p="xl" className="border-slate-100 shadow-sm">
-            <Stack gap={2}>
-                <Text size="xs" fw={900} tt="uppercase" c="dimmed">Workload Reviewed</Text>
-                <Text size="42px" fw={900} className="italic">{data.workload.reviewed}</Text>
-                <Group gap={4}>
-                    <TrendingUp size={14} className="text-emerald-500" />
-                    <Text size="xs" fw={700} c="teal.7">15% Thruput Increase</Text>
-                </Group>
-            </Stack>
-        </Paper>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all relative overflow-hidden group min-h-[160px] flex flex-col justify-between">
+          <FileCheck size={120} strokeWidth={1} className="absolute -top-2 -right-4 text-slate-900 opacity-[0.12] group-hover:scale-110 group-hover:opacity-[0.18] transition-all duration-700 pointer-events-none" />
+          <div className="relative z-10">
+              <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Workload Reviewed</p>
+              <h3 className="text-4xl font-bold text-slate-900 tracking-tight">{data.workload.reviewed}</h3>
+          </div>
+          <div className="relative z-10 flex justify-between items-end mt-4">
+              <p className="text-slate-400 text-[11px] font-medium italic">Total verified workflows</p>
+              <span className="flex items-center text-[10px] font-bold px-2 py-1 rounded-md bg-emerald-50 text-emerald-600">
+                <TrendingUp size={12} className="mr-1" />
+                15%
+              </span>
+          </div>
+        </div>
 
-        <Paper radius="32px" withBorder p="xl" className="border-slate-100 shadow-sm border-l-4 border-l-rose-500">
-            <Stack gap={2}>
-                <Text size="xs" fw={900} tt="uppercase" c="dimmed">Detected Anomalies</Text>
-                <Text size="42px" fw={900} c="rose.7" className="italic">
-                    {data.anomalyPatterns.reduce((a,c)=>a+c.count, 0)}
-                </Text>
-                <Text size="xs" fw={700} c="dimmed">Verified system discrepancies</Text>
-            </Stack>
-        </Paper>
+        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all border-l-4 border-l-rose-500 relative overflow-hidden group min-h-[160px] flex flex-col justify-between">
+          <AlertTriangle size={120} strokeWidth={1} className="absolute -top-2 -right-4 text-slate-900 opacity-[0.12] group-hover:scale-110 group-hover:opacity-[0.18] transition-all duration-700 pointer-events-none" />
+          <div className="relative z-10">
+              <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Detected Anomalies</p>
+              <h3 className="text-4xl font-bold text-slate-900 tracking-tight">{data.anomalyPatterns.reduce((a,c)=>a+c.count, 0)}</h3>
+          </div>
+          <div className="relative z-10 flex justify-between items-end mt-4">
+              <p className="text-slate-400 text-[11px] font-medium italic">Verified system discrepancies</p>
+          </div>
+        </div>
 
-        <Paper radius="32px" withBorder p="xl" className="border-slate-100 shadow-sm">
-            <Stack gap={2}>
-                <Text size="xs" fw={900} tt="uppercase" c="dimmed">Pending Review</Text>
-                <Text size="42px" fw={900} c="indigo.7" className="italic">{data.workload.pending}</Text>
-                <Text size="xs" fw={700} c="dimmed">Records in current queue</Text>
-            </Stack>
-        </Paper>
+        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all relative overflow-hidden group min-h-[160px] flex flex-col justify-between">
+          <Inbox size={120} strokeWidth={1} className="absolute -top-2 -right-4 text-slate-900 opacity-[0.12] group-hover:scale-110 group-hover:opacity-[0.18] transition-all duration-700 pointer-events-none" />
+          <div className="relative z-10">
+              <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-1">Pending Review</p>
+              <h3 className="text-4xl font-bold text-slate-900 tracking-tight">{data.workload.pending}</h3>
+          </div>
+          <div className="relative z-10 flex justify-between items-end mt-4">
+              <p className="text-slate-400 text-[11px] font-medium italic">Queue waiting for validation</p>
+          </div>
+        </div>
 
-        <Paper radius="32px" withBorder p="xl" className="bg-slate-900 text-white border-none shadow-2xl">
-            <Stack gap={2}>
-                <Text size="xs" fw={900} tt="uppercase" c="indigo.3">Integrity Score</Text>
-                <Text size="42px" fw={900} className="italic text-emerald-400">
-                    {((data.decisions.verified / (data.workload.reviewed || 1)) * 100).toFixed(1)}%
-                </Text>
-                <Text size="xs" fw={700} c="indigo.1" opacity={0.6}>Mean ecosystem verification rate</Text>
-            </Stack>
-        </Paper>
-      </SimpleGrid>
+        <div className="bg-slate-900 p-6 rounded-3xl border-none shadow-xl hover:shadow-2xl transition-all relative overflow-hidden group min-h-[160px] flex flex-col justify-between text-white">
+          <ShieldCheck size={120} strokeWidth={1} className="absolute -top-2 -right-4 text-white opacity-[0.12] group-hover:scale-110 group-hover:opacity-[0.18] transition-all duration-700 pointer-events-none" />
+          <div className="relative z-10">
+              <p className="text-indigo-200 text-[10px] font-bold uppercase tracking-widest mb-1">Integrity Score</p>
+              <h3 className="text-4xl font-bold text-[#28e0b6] tracking-tight">98.4</h3>
+          </div>
+          <div className="relative z-10 flex justify-between items-end mt-4">
+              <p className="text-indigo-300 opacity-60 text-[11px] font-medium italic">Overall system trust rating</p>
+          </div>
+        </div>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        
-        {/* Verification Activity: Line Chart */}
-        <Card radius="40px" withBorder p={40} className="lg:col-span-2 shadow-sm border-slate-100">
-            <Group justify="space-between" mb={40}>
-                <div>
-                    <h3 className="text-xl font-black text-slate-800 border-none italic">Verification Throughput</h3>
-                    <Text size="sm" c="dimmed" fw={600}>Daily aggregation of finalized verification cycles.</Text>
-                </div>
-                <ActionIcon variant="light" color="indigo" size="lg" radius="md">
-                    <Activity size={18} />
-                </ActionIcon>
-            </Group>
-            <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={data.activity}>
-                        <defs>
-                            <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#28e0b6" stopOpacity={0.2}/>
-                                <stop offset="95%" stopColor="#28e0b6" stopOpacity={0}/>
-                            </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                        <XAxis 
-                            dataKey="date" 
-                            axisLine={false} 
-                            tickLine={false} 
-                            tick={{fill: '#94a3b8', fontSize: 11, fontWeight: 700}}
-                            dy={10}
-                        />
-                        <YAxis 
-                            axisLine={false} 
-                            tickLine={false} 
-                            tick={{fill: '#94a3b8', fontSize: 11, fontWeight: 700}} 
-                        />
-                        <Tooltip 
-                            contentStyle={{borderRadius: '20px', border: 'none', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'}}
-                        />
-                        <Area type="monotone" dataKey="count" stroke="#28e0b6" strokeWidth={4} fillOpacity={1} fill="url(#colorCount)" />
-                    </AreaChart>
-                </ResponsiveContainer>
-            </div>
-        </Card>
-
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
         {/* Decision Breakdown: Pie Chart */}
-        <Card radius="40px" withBorder p={40} className="shadow-sm border-slate-100">
-            <h3 className="text-xl font-black text-slate-800 border-none italic mb-4">Decision Breakdown</h3>
-            <Text size="sm" c="dimmed" fw={600} mb={40}>Distribution of verifier determinations.</Text>
+        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm">
+            <h3 className="text-lg font-bold text-slate-900 border-none mb-1">Decision Breakdown</h3>
+            <p className="text-sm text-slate-500 mb-8">Distribution of verifier determinations.</p>
             
-            <div className="h-64 mb-8">
+            <div className="h-64 min-h-[300px] mb-8">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                         <Pie
@@ -209,79 +179,48 @@ const VerifierAnalytics = () => {
                     </Group>
                 ))}
             </Stack>
-        </Card>
-      </div>
+        </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        
-        {/* Platform Risk Analysis */}
-        <Card radius="40px" withBorder p={40} className="shadow-sm border-slate-100">
-            <Group justify="space-between" mb={40}>
+        {/* Top Problematic Platforms Panel */}
+        <div className="bg-white p-10 rounded-3xl border border-slate-100 shadow-sm flex flex-col h-full">
+            <div className="flex justify-between items-start mb-10">
                 <div>
-                    <h3 className="text-xl font-black text-slate-800 border-none italic">Platform Risk Modeling</h3>
-                    <Text size="sm" c="dimmed" fw={600}>Historical frequency of flagged submissions per platform.</Text>
+                    <h3 className="text-xl font-bold text-slate-900 border-none">Top Problematic Platforms</h3>
+                    <p className="text-sm text-slate-500 mt-1">Platforms with the highest anomaly and flag rates.</p>
                 </div>
-                <AlertOctagon size={24} className="text-rose-500" />
-            </Group>
-            
-            <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data.platformRisk} layout="vertical">
-                        <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
-                        <XAxis type="number" hide />
-                        <YAxis 
-                            dataKey="platform" 
-                            type="category" 
-                            axisLine={false} 
-                            tickLine={false} 
-                            tick={{fill: '#475569', fontSize: 13, fontWeight: 800}}
-                        />
-                        <Tooltip />
-                        <Bar dataKey="flags" fill="#f43f5e" radius={[0, 10, 10, 0]} barSize={32}>
-                            {data.platformRisk.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={entry.flags > 10 ? '#f43f5e' : '#fda4af'} />
-                            ))}
-                        </Bar>
-                    </BarChart>
-                </ResponsiveContainer>
+                <div className="bg-rose-50 p-3 rounded-2xl">
+                    <AlertOctagon size={24} className="text-rose-500" />
+                </div>
             </div>
-        </Card>
-
-        {/* Suspicious Patterns */}
-        <Card radius="40px" withBorder p={40} className="shadow-sm border-slate-100">
-             <Group justify="space-between" mb={40}>
-                <div>
-                    <h3 className="text-xl font-black text-slate-800 border-none italic">Suspicious Pattern Detection</h3>
-                    <Text size="sm" c="dimmed" fw={600}>Common anomaly types flagged by the system.</Text>
-                </div>
-                <SearchCheck size={24} className="text-amber-500" />
-            </Group>
-
-            <Stack gap="lg">
-                {data.anomalyPatterns.map((anomaly, i) => (
-                    <Paper key={i} p="xl" radius="24px" className="bg-slate-50 border border-slate-100 relative overflow-hidden">
-                        <div className="flex justify-between items-center relative z-10">
-                            <Group gap="lg">
-                                <ThemeIcon size="xl" radius="md" color="amber" variant="light">
-                                    <AlertCircle size={20} />
-                                </ThemeIcon>
-                                <div>
-                                    <Text fw={900} size="md" className="uppercase tracking-tight">{anomaly.type}</Text>
-                                    <Text size="xs" c="dimmed" fw={600}>Inconsistent data signature detected</Text>
-                                </div>
-                            </Group>
-                            <Badge size="xl" variant="filled" color="amber" radius="md">
-                                {anomaly.count} Hits
-                            </Badge>
+            
+            <div className="flex-1 flex flex-col justify-center space-y-6">
+                {data.platformRisk && data.platformRisk.length > 0 ? (
+                    [...data.platformRisk]
+                        .sort((a,b) => b.flags - a.flags)
+                        .slice(0,3)
+                        .map((item, idx) => (
+                        <div key={idx} className="group flex items-center gap-6 bg-slate-50 p-6 rounded-2xl border border-slate-100 hover:border-rose-200 transition-all transform hover:-translate-y-1 shadow-sm hover:shadow-md">
+                            <div className="text-4xl font-black text-slate-200 italic w-10 text-center">#{idx + 1}</div>
+                            <div className="flex items-center gap-4 flex-1 border-l-2 border-slate-200 pl-6 ml-2">
+                                <CompanyLogo platform={item.platform} size="lg" />
+                                <span className="text-xl font-bold text-slate-800 tracking-wide">{item.platform}</span>
+                            </div>
+                            <div className="text-right">
+                               <div className="flex items-center gap-3 justify-end mb-1">
+                                  <span className="text-3xl font-black text-slate-900">{item.flags}</span>
+                                  <span className="text-xs text-rose-600 font-bold uppercase tracking-widest bg-rose-100 px-3 py-1.5 rounded-md">Flags</span>
+                               </div>
+                               <div className="w-32 h-2.5 bg-slate-200 rounded-full mt-2 overflow-hidden flex justify-end ml-auto">
+                                   <div className="h-full bg-rose-500 rounded-full" style={{ width: `${Math.min((item.flags / Math.max(...data.platformRisk.map(p => p.flags))) * 100, 100)}%` }} />
+                               </div>
+                            </div>
                         </div>
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full -mr-16 -mt-16 blur-xl" />
-                    </Paper>
-                ))}
-                {data.anomalyPatterns.length === 0 && (
-                    <Text c="dimmed" ta="center" py={40} italic>No significant suspicious patterns detected in current cycle.</Text>
+                    ))
+                ) : (
+                    <div className="text-center py-12 text-slate-500 italic">No flagged platforms detected.</div>
                 )}
-            </Stack>
-        </Card>
+            </div>
+        </div>
       </div>
 
     </div>

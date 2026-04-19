@@ -151,11 +151,11 @@ const Analytics = () => {
             <div className="flex gap-10">
                 <div className="text-center">
                     <p className="text-slate-400 text-sm mb-1">Your Avg Rate</p>
-                    <p className="text-4xl font-black italic">₹{avgRate}</p>
+                    <p className="text-4xl font-black italic">Rs. {avgRate}</p>
                 </div>
                 <div className="text-center">
                     <p className="text-slate-400 text-sm mb-1">City Median Rate</p>
-                    <p className="text-4xl font-black italic opacity-40">₹{cityMedian}</p>
+                    <p className="text-4xl font-black italic opacity-40">Rs. {cityMedian}</p>
                 </div>
             </div>
         </div>

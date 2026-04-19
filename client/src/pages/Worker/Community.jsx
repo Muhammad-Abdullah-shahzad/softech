@@ -21,6 +21,7 @@ import {
     getMyCommunityPosts,
     getBroadcasts
 } from '../../api/grievance';
+import { PlatformDisplay } from '../../components/CompanyLogo';
 import { 
     Badge, 
     Progress, 
@@ -288,7 +289,7 @@ const Community = () => {
                                 </Stack>
 
                                 <div className="flex justify-between items-center pt-4 border-t border-slate-50">
-                                    <Badge variant="outline" color="slate" size="lg" radius="md">{post.platform}</Badge>
+                                    <PlatformDisplay platform={post.platform} size="sm" className="bg-slate-50 px-3 py-1 rounded-full border border-slate-200" />
                                     <Group gap="xs">
                                         <ActionIcon variant="light" color="indigo" size="lg" radius="md">
                                             <ThumbsUp size={18} />
@@ -323,6 +324,7 @@ const Community = () => {
                     required
                     value={formData.platform}
                     onChange={(val) => setFormData(f => ({...f, platform: val}))}
+                    renderOption={({ option }) => <PlatformDisplay platform={option.value} size="sm" />}
                     radius="md"
                 />
                 <Select 

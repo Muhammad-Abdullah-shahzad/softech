@@ -54,7 +54,7 @@ const IncomeCertificate = () => {
 
     const toWords = (num) => {
         const val = parseFloat(num || 0);
-        return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(val).replace('₹', '') + ' Rupees Only';
+        return new Intl.NumberFormat('en-PK', { style: 'currency', currency: 'PKR' }).format(val).replace('Rs.', '') + ' Rupees Only';
     }
 
     printWindow.document.write(`
@@ -253,7 +253,7 @@ const IncomeCertificate = () => {
                         <td style="text-align: left;">${item.platform} Verified Operational Shift</td>
                         <td>${item.hours}</td>
                         <td style="color: #38761d; font-weight: 900;">Verified</td>
-                        <td style="text-align: right; font-weight: bold;">₹${(parseFloat(item.grossEarnings || 0) - parseFloat(item.deductions || 0)).toLocaleString()}</td>
+                        <td style="text-align: right; font-weight: bold;">Rs. ${(parseFloat(item.grossEarnings || 0) - parseFloat(item.deductions || 0)).toLocaleString()}</td>
                     </tr>
                 `).join('')}
                 <!-- Dynamic Spacing for Formal Look -->
@@ -266,15 +266,15 @@ const IncomeCertificate = () => {
                 <table class="summary-table">
                     <tr>
                         <td class="summary-name">Gross Verified Value</td>
-                        <td class="summary-val">₹${(certificate?.items || []).reduce((a,c) => a+parseFloat(c.grossEarnings || 0), 0).toLocaleString()}</td>
+                        <td class="summary-val">Rs. ${(certificate?.items || []).reduce((a,c) => a+parseFloat(c.grossEarnings || 0), 0).toLocaleString()}</td>
                     </tr>
                     <tr>
                         <td class="summary-name">Less Aggregate Deductions</td>
-                        <td class="summary-val">₹${(certificate?.items || []).reduce((a,c) => a+parseFloat(c.deductions || 0), 0).toLocaleString()}</td>
+                        <td class="summary-val">Rs. ${(certificate?.items || []).reduce((a,c) => a+parseFloat(c.deductions || 0), 0).toLocaleString()}</td>
                     </tr>
                     <tr>
                         <td class="summary-name" style="background: #f1f1f1;">TOTAL NET CERTIFIED AMOUNT</td>
-                        <td class="summary-val" style="background: #f1f1f1; font-size: 16px;">₹${parseFloat(certificate?.totalNet || 0).toLocaleString()}</td>
+                        <td class="summary-val" style="background: #f1f1f1; font-size: 16px;">Rs. ${parseFloat(certificate?.totalNet || 0).toLocaleString()}</td>
                     </tr>
                 </table>
             </div>
@@ -301,7 +301,7 @@ const IncomeCertificate = () => {
                     The FairGig Automated Verification Service hereby confirms that based on crowdsourced validation and algorithmic integrity checks, this income statement accurately reflects the progression of verified work and satisfies the system's requirements for financial certification.
                 </div>
                 <div class="signs-container">
-                    <span>Certified Amount: ₹${certificate?.totalNet?.toLocaleString()}</span>
+                    <span>Certified Amount: Rs. ${certificate?.totalNet?.toLocaleString()}</span>
                     <span>Node ID: FG-SYS-8821</span>
                 </div>
             </div>
@@ -415,7 +415,7 @@ const IncomeCertificate = () => {
                     </div>
                     <div className="bg-slate-50 p-6 rounded-3xl text-center border border-slate-100 min-w-[200px]">
                         <Text size="xs" color="dimmed" fw={800} tt="uppercase" mb={4}>Total Verified</Text>
-                        <Text size="32px" fw={900} className="text-emerald-600 leading-none">₹{certificate.totalNet}</Text>
+                        <Text size="32px" fw={900} className="text-emerald-600 leading-none">Rs. {certificate.totalNet}</Text>
                     </div>
                 </div>
 
