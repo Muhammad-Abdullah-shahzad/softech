@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, Navigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { navigationConfig } from '../config/navigation';
-import { Avatar, Menu, Group, ActionIcon, Indicator, Divider, Badge } from '@mantine/core';
+import { Bell, Search, User, LogOut, ShieldCheck, ShieldAlert, X, Mail, MapPin, Fingerprint, Menu as MenuIcon } from 'lucide-react';
+import { Avatar, Menu, Group, ActionIcon, Indicator, Divider, Badge, Text } from '@mantine/core';
+import { getProfile } from '../api/profile';
 import { notifications } from '@mantine/notifications';
-import { Bell, Search, User, LogOut, ShieldCheck, ShieldAlert, X } from 'lucide-react';
 
 const VerifierDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -33,6 +35,13 @@ const VerifierDashboard = () => {
     }
 
     setUser(userData);
+
+    // Fetch fresh profile data to get all fields
+    if (userData.id) {
+      getProfile(userData.id)
+        .then(res => setUser(prev => ({ ...prev, ...res.data })))
+        .catch(err => console.error('Dashboard profile fetch failed:', err));
+    }
   }, [navigate]);
 
   const handleLogout = () => {
@@ -46,13 +55,25 @@ const VerifierDashboard = () => {
   return (
     <div className="flex min-h-screen bg-[#F8FAFC]">
       {/* Sidebar */}
-      <Sidebar navigation={navigationConfig} currentRole="verifier" />
+      <Sidebar 
+        navigation={navigationConfig} 
+        currentRole="verifier" 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
+      />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Navbar */}
-        <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-30 shadow-sm">
+        <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 sticky top-0 z-30 shadow-sm">
           <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden p-2 hover:bg-slate-50 rounded-xl text-slate-600 transition-colors"
+            >
+              <MenuIcon size={24} />
+            </button>
+
             <div className="relative w-96 hidden lg:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input
@@ -61,10 +82,10 @@ const VerifierDashboard = () => {
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all"
               />
             </div>
+          </div>
             {/* <Badge color="indigo" variant="light" leftSection={<ShieldCheck size={14} />} radius="md" size="lg">
               Verifier Mode
             </Badge> */}
-          </div>
 
           <Group gap="xl">
             {/* <Indicator color="rose" size={10} offset={2} processing>
@@ -82,13 +103,34 @@ const VerifierDashboard = () => {
                     className="border-2 border-white shadow-sm"
                   />
                   <div className="text-left hidden sm:block">
-                    <p className="text-sm font-bold text-slate-900 leading-tight">{user?.name || 'Verifier Account'}</p>
-                    <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">Verifier</p>
+                    <p className="text-sm font-bold text-slate-900 leading-tight">{user?.fullName || 'Verifier Account'}</p>
+                    <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">{user?.role || 'Verifier'}</p>
                   </div>
                 </button>
               </Menu.Target>
 
               <Menu.Dropdown p={8}>
+                <Menu.Label>Verifier Profile Data</Menu.Label>
+                <div className="px-3 py-2">
+                    <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb={4}>Identity Node</Text>
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-slate-600">
+                            <Mail size={12} />
+                            <Text size="xs" fw={600}>{user?.email || 'Unauthorized Email'}</Text>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-600">
+                            <MapPin size={12} />
+                            <Text size="xs" fw={600}>{user?.city || 'Unknown Node'}</Text>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-600">
+                            <Fingerprint size={12} />
+                            <Text size="xs" fw={600} className="font-mono">{user?.cnic || 'Unverified ID'}</Text>
+                        </div>
+                    </div>
+                </div>
+
+                <Divider my={8} />
+
                 <Menu.Label>Verifier Dashboard</Menu.Label>
                 <Menu.Item leftSection={<User size={14} />} onClick={() => navigate('/dashboard/verifier/profile')} className="rounded-xl">
                   Profile Settings

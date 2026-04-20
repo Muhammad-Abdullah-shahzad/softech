@@ -9,7 +9,7 @@ echo "🚀 Starting FairGig Microservices..."
 # Function to clear ports
 clear_ports() {
     echo "🧹 Cleaning up ports..."
-    local ports=(8000 5000 5002 5003 5004 5005 5173)
+    local ports=(8000 5000 5002 5003 5004 5005 5006 5173)
     for port in "${ports[@]}"; do
         pid=$(lsof -ti :$port)
         if [ ! -z "$pid" ]; then
@@ -36,11 +36,16 @@ start_python_service() {
     local port=$2
     local name=$3
     echo -e "🟢 \033[1;32mStarting $name\033[0m on port $port..."
-    cd "$ROOT_DIR/$dir" && (python3 -m uvicorn app.main:app --port $port > /dev/null 2>&1 &)
+    if [ -d "$ROOT_DIR/$dir/app" ]; then
+        cd "$ROOT_DIR/$dir" && (python3 -m uvicorn app.main:app --port $port > /dev/null 2>&1 &)
+    else
+        cd "$ROOT_DIR/$dir" && (python3 -m uvicorn main:app --port $port > /dev/null 2>&1 &)
+    fi
 }
 
 # Start all services
 start_python_service "fair-gig-monorepo/services/anomaly-detection-service" 8000 "Anomaly Detection"
+start_python_service "fair-gig-monorepo/services/profile-service" 5006 "Profile Service"
 start_node_service "fair-gig-monorepo/services/authService" 5000 "Auth Service"
 start_node_service "fair-gig-monorepo/services/earnings-service" 5002 "Earnings Service"
 start_node_service "fair-gig-monorepo/services/grievance-service" 5003 "Grievance Service"

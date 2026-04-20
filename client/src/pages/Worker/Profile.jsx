@@ -139,12 +139,12 @@ const Profile = () => {
                       size={140} 
                       radius="100%" 
                       className="mx-auto mb-8 border-4 border-slate-50 shadow-xl"
-                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${profile?.fullName}`}
+                      src={`https://api.dicebear.com/7.x/initials/svg?seed=${profile?.fullName || localUser?.fullName}`}
                   />
-                  <h3 className="text-2xl font-bold text-slate-900 tracking-tight leading-none mb-2">{profile?.fullName}</h3>
+                  <h3 className="text-2xl font-bold text-slate-900 tracking-tight leading-none mb-2">{profile?.fullName || localUser?.fullName}</h3>
                   <div className="flex flex-col gap-3 mt-4">
                       <span className="px-4 py-1.5 bg-indigo-50 text-indigo-600 rounded-xl text-[10px] font-black uppercase tracking-widest border border-indigo-100 w-fit mx-auto">
-                        {profile?.role} • CORE NODE
+                        {profile?.role || localUser?.role} • CORE NODE
                       </span>
                       <div className="flex items-center justify-center gap-2 py-2 px-4 bg-emerald-50 text-emerald-600 rounded-xl border border-emerald-100 w-fit mx-auto">
                         <ShieldCheck size={14} />
@@ -155,7 +155,7 @@ const Profile = () => {
                   <div className="mt-10 pt-8 border-t border-slate-50 flex flex-col gap-4">
                     <div className="flex justify-between items-center px-4 py-3 bg-slate-50 rounded-2xl border border-slate-100">
                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Global ID</span>
-                        <span className="text-xs font-bold text-slate-900 font-mono leading-none">#{profile?.id.substring(18).toUpperCase()}</span>
+                        <span className="text-xs font-bold text-slate-900 font-mono leading-none">#{profile?.id ? profile.id.substring(18).toUpperCase() : 'LOADING'}</span>
                     </div>
                   </div>
                 </div>
@@ -193,7 +193,7 @@ const Profile = () => {
                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Legal Name</label>
                             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center gap-3">
                                 <User size={16} className="text-slate-400" />
-                                <span className="text-sm font-bold text-slate-900">{profile?.fullName}</span>
+                                <span className="text-sm font-bold text-slate-900">{profile?.fullName || localUser?.fullName}</span>
                             </div>
                         </div>
                         <div className="space-y-2">

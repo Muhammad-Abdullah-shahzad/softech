@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { navigationConfig } from '../config/navigation';
-import { Avatar, Menu, Group, ActionIcon, Indicator, Divider, Badge } from '@mantine/core';
+import { Avatar, Menu, Group, ActionIcon, Indicator, Divider, Badge, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { Bell, Search, User, LogOut, ShieldCheck, Database, ShieldAlert, X } from 'lucide-react';
+import { Bell, Search, User, LogOut, ShieldCheck, Database, ShieldAlert, X, Mail, MapPin, Fingerprint, Menu as MenuIcon } from 'lucide-react';
+import { getProfile } from '../api/profile';
 
 const AdvocateDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -29,6 +31,13 @@ const AdvocateDashboard = () => {
         navigate('/login');
       }
       setUser(parsedUser);
+
+      // Fetch fresh profile data to get all fields
+      if (parsedUser.id) {
+        getProfile(parsedUser.id)
+          .then(res => setUser(prev => ({ ...prev, ...res.data })))
+          .catch(err => console.error('Dashboard profile fetch failed:', err));
+      }
     }
   }, [navigate]);
 
@@ -41,13 +50,25 @@ const AdvocateDashboard = () => {
   return (
     <div className="flex min-h-screen bg-[#FDFDFF]">
       {/* Sidebar - Using the analyst/advocate config */}
-      <Sidebar navigation={navigationConfig} currentRole="analyst" />
+      <Sidebar 
+        navigation={navigationConfig} 
+        currentRole="analyst" 
+        isOpen={isSidebarOpen} 
+        onClose={() => setIsSidebarOpen(false)} 
+      />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Navbar */}
-        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-8 sticky top-0 z-30">
+        <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-4 md:px-8 sticky top-0 z-30">
           <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden p-2 hover:bg-slate-50 rounded-xl text-slate-600 transition-colors"
+            >
+              <MenuIcon size={24} />
+            </button>
+
             <div className="relative w-96 hidden md:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input
@@ -56,10 +77,10 @@ const AdvocateDashboard = () => {
                 className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
               />
             </div>
+          </div>
             {/* <Badge color="indigo" variant="light" leftSection={<Database size={14}/>} radius="md" size="lg" py={12}>
                 Advocate Access
               </Badge> */}
-          </div>
 
           <Group gap="xl">
             {/* <Indicator color="rose" size={10} offset={2} processing>
@@ -77,15 +98,36 @@ const AdvocateDashboard = () => {
                     className="border-2 border-white shadow-sm"
                   />
                   <div className="text-left hidden sm:block">
-                    <p className="text-sm font-bold text-slate-900 leading-tight">{user?.name || 'Advocate Account'}</p>
-                    <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">Labour Rights Analyst</p>
+                    <p className="text-sm font-bold text-slate-900 leading-tight">{user?.fullName || 'Advocate Account'}</p>
+                    <p className="text-[10px] font-bold text-indigo-600 uppercase tracking-wider">{user?.role || 'Labour Rights Analyst'}</p>
                   </div>
                 </button>
               </Menu.Target>
 
               <Menu.Dropdown p={8}>
-                <Menu.Label>Advocate Profile</Menu.Label>
-                <Menu.Item leftSection={<User size={14} />} className="rounded-xl">
+                <Menu.Label>Advocate Profile Node</Menu.Label>
+                <div className="px-3 py-2">
+                    <Text size="xs" fw={700} c="dimmed" tt="uppercase" mb={4}>Registry Details</Text>
+                    <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-slate-600">
+                            <Mail size={12} />
+                            <Text size="xs" fw={600}>{user?.email || 'Unauthorized Email'}</Text>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-600">
+                            <MapPin size={12} />
+                            <Text size="xs" fw={600}>{user?.city || 'Unknown Node'}</Text>
+                        </div>
+                        <div className="flex items-center gap-2 text-slate-600">
+                            <Fingerprint size={12} />
+                            <Text size="xs" fw={600} className="font-mono">{user?.cnic || 'Unverified ID'}</Text>
+                        </div>
+                    </div>
+                </div>
+                
+                <Divider my={8} />
+
+                <Menu.Label>System</Menu.Label>
+                <Menu.Item leftSection={<User size={14} />} onClick={() => navigate('/dashboard/advocate/profile')} className="rounded-xl">
                   Profile Settings
                 </Menu.Item>
                 <Divider my={4} />

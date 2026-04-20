@@ -27,9 +27,9 @@ for service in "${services[@]}"; do
     fi
 done
 
-# Python service
-echo "Installing dependencies for anomaly-detection-service..."
-cd "$ROOT_DIR/fair-gig-monorepo/services/anomaly-detection-service"
-python3 -m pip install -r requirements.txt
+# Python services
+echo "Installing dependencies for Python services..."
+python3 -m pip install -r "$ROOT_DIR/fair-gig-monorepo/services/anomaly-detection-service/requirements.txt"
+python3 -m pip install -r "$ROOT_DIR/fair-gig-monorepo/services/profile-service/requirements.txt"
 
 echo "✅ Setup complete!"

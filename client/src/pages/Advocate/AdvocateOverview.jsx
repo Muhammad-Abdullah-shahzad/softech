@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getAdvocateOverview } from '../../api/analytics';
 import {
     BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-    PieChart, Pie, Cell, LineChart, Line, Legend, Treemap, AreaChart, Area
+    PieChart, Pie, Cell, LineChart, Line, Treemap, AreaChart, Area
 } from 'recharts';
 import {
     Card,
@@ -32,6 +32,7 @@ import {
     Zap,
     ShieldCheck
 } from 'lucide-react';
+import { PlatformDisplay, CompanyLogo } from '../../components/CompanyLogo';
 
 const AdvocateOverview = () => {
     const [data, setData] = useState(null);
@@ -187,7 +188,6 @@ const AdvocateOverview = () => {
                   contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 20px 40px -10px rgba(0,0,0,0.1)' }} 
                   cursor={{ stroke: '#cbd5e1', strokeWidth: 1 }}
                 />
-                <Legend iconType="circle" wrapperStyle={{ paddingTop: '30px' }} />
                 {data.commissionTrends.map((p, i) => (
                   <Area 
                     key={p._id} 
@@ -201,6 +201,24 @@ const AdvocateOverview = () => {
                 ))}
               </AreaChart>
             </ResponsiveContainer>
+          </div>
+
+          <Divider my="xl" variant="dashed" label="Platform Performance Breakdown" labelPosition="center" />
+          
+          <div className="flex flex-wrap gap-6 justify-center">
+            {data.commissionTrends.map((p, i) => (
+              <div key={p._id} className="flex items-center gap-3 bg-slate-50/50 px-4 py-2 rounded-2xl border border-slate-100 relative group/plat">
+                <div 
+                  className="w-1 h-8 rounded-full absolute left-0 top-1/2 -translate-y-1/2 opacity-60" 
+                  style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} 
+                />
+                <CompanyLogo platform={p._id} size="sm" />
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-black text-slate-800 uppercase tracking-tighter leading-none">{p._id}</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Avg: {(p.trends.reduce((acc, t) => acc + t.rate, 0) / p.trends.length).toFixed(1)}%</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -266,9 +284,7 @@ const AdvocateOverview = () => {
                 <div key={i} className="group">
                   <div className="flex justify-between items-center mb-2 px-1">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center font-bold text-slate-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors uppercase">
-                          {plat.platform[0]}
-                      </div>
+                      <CompanyLogo platform={plat.platform} size="md" />
                       <div className="flex flex-col">
                         <span className="text-sm font-bold text-slate-800 uppercase tracking-tighter leading-none">{plat.platform}</span>
                         <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Ethical Compliance</span>
@@ -307,8 +323,8 @@ const AdvocateOverview = () => {
                       </div>
                       <div className="flex-1">
                         <p className="text-[10px] font-black text-rose-800 uppercase tracking-[0.15em] mb-1">Commission Spike</p>
-                        <p className="text-xs font-bold text-rose-700 leading-tight">
-                          {spike.platform} rates rose to {spike.currentRate}% (↑{spike.increase}%).
+                        <p className="text-xs font-bold text-rose-700 leading-tight flex items-center gap-2">
+                          <PlatformDisplay platform={spike.platform} size="xs" className="!bg-transparent" /> rates rose to {spike.currentRate}% (↑{spike.increase}%).
                         </p>
                       </div>
                     </div>

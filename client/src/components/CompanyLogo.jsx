@@ -45,7 +45,7 @@ export const PlatformDisplay = ({ platform, size = 'sm', className = '' }) => {
     return (
         <div className={`flex items-center gap-2 ${className}`}>
             <CompanyLogo platform={platform} size={size} />
-            <span className="font-semibold text-slate-800">{platform}</span>
+            <span className="font-bold text-slate-800 uppercase tracking-tighter">{platform}</span>
         </div>
     );
 };
